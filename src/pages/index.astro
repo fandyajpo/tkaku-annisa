@@ -1,0 +1,529 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Quiz from "../components/Quiz.astro";
+
+const materi = [
+  {
+    nama: "Bilangan",
+    deskripsi: "Himpunan, bilangan berpangkat, dan operasi bilangan.",
+    jumlah: "3 soal",
+    ikon: "#",
+    aksen: "#ffc94d",
+  },
+  {
+    nama: "Aljabar",
+    deskripsi: "Fungsi, barisan dan deret, pertidaksamaan, matriks, dan polinomial.",
+    jumlah: "17 soal",
+    ikon: "x²",
+    aksen: "#5ba9e4",
+  },
+  {
+    nama: "Geometri dan Pengukuran",
+    deskripsi: "Sudut, bangun datar dan ruang, vektor, lingkaran, dan transformasi.",
+    jumlah: "21 soal",
+    ikon: "△",
+    aksen: "#ff7a59",
+  },
+  {
+    nama: "Data dan Peluang",
+    deskripsi: "Membaca diagram, ukuran pemusatan, pencacahan, dan peluang.",
+    jumlah: "5 soal",
+    ikon: "▤",
+    aksen: "#9b8afb",
+  },
+  {
+    nama: "Kalkulus",
+    deskripsi: "Limit fungsi aljabar dan trigonometri.",
+    jumlah: "4 soal",
+    ikon: "∫",
+    aksen: "#5ec4a6",
+  },
+];
+
+const keunggulan = [
+  {
+    no: "01",
+    judul: "Bimbingan personal",
+    teks: "Mentoring yang disesuaikan dengan kebutuhan siswa dan guru dalam mengatasi tantangan akademik yang rumit.",
+    aksen: "#ffc94d",
+  },
+  {
+    no: "02",
+    judul: "Materi berkualitas",
+    teks: "Sumber belajar yang sesuai mata pelajaran, dirancang untuk mendukung belajar seumur hidup dan perkembangan karier.",
+    aksen: "#5ec4a6",
+  },
+  {
+    no: "03",
+    judul: "Dukungan ahli",
+    teks: "Bimbingan ahli dan bantuan teknis agar kegiatan belajar berjalan lancar di semua perangkat dan platform.",
+    aksen: "#5ba9e4",
+  },
+];
+---
+
+<Layout
+  title="TKAku – Latihan Soal TKA dengan Pembahasan Lengkap"
+  description="Latihan soal TKA Matematika SMA/MA/SMK 2025 dengan kunci jawaban dan pembahasan langkah demi langkah."
+>
+  <header>
+    <div class="wrap nav">
+      <a class="logo" href="#">
+        <span class="logo-mark" aria-hidden="true">T</span>
+        TKAku
+      </a>
+      <nav aria-label="Menu utama">
+        <ul>
+          <li><a href="/soal/">Latihan</a></li>
+          <li><a href="#materi">Materi</a></li>
+          <li><a href="#keunggulan">Keunggulan</a></li>
+          <li><a href="#kontak">Kontak</a></li>
+        </ul>
+      </nav>
+      <a class="btn btn-utama nav-cta" href="/soal/">Mulai latihan</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <span class="warp warp-1" aria-hidden="true"><span class="deco deco-1"></span></span>
+      <span class="warp warp-2" aria-hidden="true"><span class="deco deco-2"></span></span>
+      <span class="warp warp-3" aria-hidden="true"><span class="deco deco-3"></span></span>
+
+      <div class="wrap hero-grid">
+        <div class="hero-teks">
+          <span class="badge reveal">Latihan TKA Matematika 2025</span>
+          <h1 class="reveal">
+            Latihan soal TKA, seru dan
+            <em>paham</em> sampai tuntas
+          </h1>
+          <p class="lead reveal">
+            Soal TKA Matematika SMA/MA/SMK 2025 dengan kunci jawaban dan pembahasan langkah demi
+            langkah, supaya kamu paham caranya, bukan sekadar hafal jawabannya.
+          </p>
+          <div class="aksi reveal">
+            <a class="btn btn-utama" href="/soal/">Mulai latihan</a>
+            <a class="btn btn-lain" href="#keunggulan">Lihat keunggulan</a>
+          </div>
+          <p class="slogan reveal">Empowering Communities Through Education</p>
+        </div>
+
+        <div class="hero-kuis reveal">
+          <Quiz />
+        </div>
+      </div>
+    </section>
+
+    <div class="ringkas">
+      <div class="wrap">
+        <ul>
+          <li class="reveal"><b data-angka="50">50</b> soal dalam 2 paket</li>
+          <li class="reveal"><b data-angka="5">5</b> materi utama</li>
+          <li class="reveal">Pembahasan <b>langkah demi langkah</b></li>
+          <li class="reveal">Bisa dibuka dari <b>HP</b></li>
+        </ul>
+      </div>
+    </div>
+
+    <section id="materi">
+      <div class="wrap">
+        <div class="judul-blok reveal">
+          <span class="eyebrow">Daftar materi</span>
+          <h2 class="judul">Pilih materi yang ingin dilatih</h2>
+          <p class="sub">
+            Mulai dari topik yang paling kamu butuhkan. Setiap soal punya kunci jawaban dan
+            pembahasan.
+          </p>
+        </div>
+
+        <ul class="materi reveal-group">
+          {
+            materi.map((m) => (
+              <li class="reveal" style={`--aksen:${m.aksen}`}>
+                <div class="materi-atas">
+                  <span class="ikon" aria-hidden="true">
+                    {m.ikon}
+                  </span>
+                  <span class="jml">{m.jumlah}</span>
+                </div>
+                <h3>{m.nama}</h3>
+                <p>{m.deskripsi}</p>
+              </li>
+            ))
+          }
+        </ul>
+
+        <div class="paket reveal-group">
+          <a class="utama reveal" href="/soal/wajib/">
+            Paket Wajib (Umum)
+            <small>25 soal · 45 menit</small>
+          </a>
+          <a class="reveal" href="/soal/lanjut/">
+            Paket Tingkat Lanjut
+            <small>25 soal · 45 menit</small>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="unggul" id="keunggulan">
+      <div class="wrap">
+        <div class="judul-blok reveal">
+          <span class="eyebrow terang">Kenapa TKAku</span>
+          <h2 class="judul">Belajar jadi lebih terarah</h2>
+          <p class="sub">Dibuat untuk siswa dan guru yang ingin berlatih dengan materi yang jelas.</p>
+        </div>
+
+        <div class="kolom reveal-group">
+          {
+            keunggulan.map((k) => (
+              <div class="reveal" style={`--aksen:${k.aksen}`}>
+                <span class="no">{k.no}</span>
+                <h3>{k.judul}</h3>
+                <p>{k.teks}</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="ajakan">
+      <div class="wrap">
+        <div class="isi reveal">
+          <span class="eyebrow">Yuk mulai</span>
+          <h2 class="judul">Siap berlatih hari ini?</h2>
+          <p>Pilih satu paket, kerjakan, lalu cocokkan dengan pembahasannya.</p>
+          <a class="btn btn-utama" href="/soal/">Mulai latihan</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="kontak" id="kontak">
+      <div class="wrap">
+        <div class="reveal">
+          <span class="eyebrow">Masukanmu berarti</span>
+          <h2 class="judul">Komentar dan saran</h2>
+          <p class="sub">
+            Menemukan soal yang salah, pembahasan yang kurang jelas, atau punya ide untuk TKAku?
+            Tulis di sini, kami akan membacanya dengan senang hati.
+          </p>
+        </div>
+
+        <form id="form" novalidate class="reveal">
+          <label
+            >Nama<input type="text" name="nama" autocomplete="name" required placeholder="Nama kamu" /></label
+          >
+          <label
+            >Email<input type="email" name="email" autocomplete="email" required placeholder="nama@email.com" /></label
+          >
+          <label
+            >Pesan<textarea name="pesan" required placeholder="Tulis masukanmu di sini..."></textarea></label
+          >
+          <button class="btn btn-utama" type="submit">Kirim masukan</button>
+          <div class="terkirim" id="terkirim" role="status">
+            Terima kasih, masukanmu sudah kami terima. Sampai ketemu di latihan berikutnya!
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>© 2026 TKAku</span>
+      <span>Empowering Communities Through Education</span>
+    </div>
+  </footer>
+</Layout>
+
+<style>
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(255,253,247,.88);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--abu-100);
+  }
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:18px;height:70px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px;color:var(--hijau-900);text-decoration:none;letter-spacing:-.02em}
+  .logo-mark{
+    width:34px;height:34px;border-radius:12px 12px 12px 4px;
+    background:linear-gradient(140deg,var(--hijau-500),var(--hijau-900));
+    color:#fff;display:grid;place-items:center;font-size:17px;
+    box-shadow:0 10px 18px -12px rgba(29,58,49,.95);
+  }
+  .nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0}
+  .nav ul a{text-decoration:none;color:var(--abu-600);font-weight:600;font-size:15px;transition:color .15s ease}
+  .nav ul a:hover{color:var(--hijau-700)}
+  .nav-cta{padding:10px 20px;font-size:15px}
+
+  /* hero */
+  .hero{position:relative;overflow:hidden;background:radial-gradient(900px 460px at 78% -10%,var(--hijau-100),transparent 62%),var(--krem);border-bottom:1px solid var(--abu-100)}
+  .hero-grid{display:grid;grid-template-columns:1.03fr .97fr;gap:56px;align-items:center;padding-top:72px;padding-bottom:86px;position:relative;z-index:1}
+  .badge{
+    display:inline-flex;align-items:center;gap:8px;
+    background:#fff;border:1.5px solid var(--hijau-200);color:var(--hijau-700);
+    font-weight:700;font-size:14px;padding:7px 15px;border-radius:999px;
+    box-shadow:0 10px 20px -16px rgba(29,58,49,.9);
+  }
+  .badge::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--kuning);box-shadow:0 0 0 3px #ffeab5}
+  h1{font-size:clamp(34px,5vw,56px);line-height:1.06;letter-spacing:-.03em;margin:20px 0 20px;color:var(--hijau-900);font-weight:800}
+  h1 em{
+    font-style:normal;color:var(--hijau-700);
+    background-image:linear-gradient(transparent 60%,var(--kuning) 60%,var(--kuning) 92%,transparent 92%);
+    padding:0 4px;border-radius:4px;
+  }
+  .lead{font-size:19px;color:var(--abu-600);margin:0 0 30px;max-width:47ch}
+  .aksi{display:flex;flex-wrap:wrap;gap:12px}
+  .slogan{margin-top:26px;font-size:14px;font-weight:600;color:var(--abu-600);letter-spacing:.04em;text-transform:uppercase}
+  .hero-kuis{position:relative}
+  .warp{position:absolute;pointer-events:none;z-index:0;display:block}
+  .warp-1{top:11%;right:5%}
+  .warp-2{bottom:13%;left:6%}
+  .warp-3{top:57%;right:44%}
+  .deco{display:block;border-radius:50%}
+  .deco-1{width:110px;height:110px;background:var(--kuning);opacity:.35}
+  .deco-2{width:74px;height:74px;border:10px solid var(--mint);opacity:.4;box-sizing:border-box}
+  .deco-3{width:46px;height:46px;background:var(--koral);opacity:.32;border-radius:14px;transform:rotate(18deg)}
+
+  /* ringkas */
+  .ringkas{padding:26px 0;background:#fff;border-bottom:1px solid var(--abu-100)}
+  .ringkas ul{display:flex;flex-wrap:wrap;gap:12px;list-style:none;margin:0;padding:0}
+  .ringkas li{
+    display:flex;align-items:center;gap:9px;
+    background:var(--abu-50);border:1px solid var(--abu-100);
+    padding:9px 17px;border-radius:999px;font-size:15px;font-weight:500;color:var(--abu-600);
+  }
+  .ringkas li b{color:var(--hijau-900);font-weight:800}
+  .ringkas li::before{content:"";width:7px;height:7px;border-radius:2px;background:var(--hijau-500);transform:rotate(45deg)}
+
+  /* bagian umum */
+  section{padding:86px 0}
+  .judul-blok{margin-bottom:38px;max-width:62ch}
+  .eyebrow{
+    display:inline-block;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--hijau-700);background:var(--hijau-100);padding:5px 13px;border-radius:999px;margin-bottom:14px;
+  }
+  .eyebrow.terang{background:rgba(255,255,255,.1);color:var(--mint)}
+  h2.judul{font-size:clamp(26px,3.4vw,38px);letter-spacing:-.02em;line-height:1.15;margin:0 0 12px;color:var(--hijau-900);font-weight:800}
+  .sub{color:var(--abu-600);margin:0;max-width:56ch;font-size:17px}
+
+  /* materi */
+  .materi{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:18px;list-style:none;margin:0;padding:0;
+  }
+  .materi li{
+    background:#fff;border:1.5px solid var(--abu-100);border-radius:var(--radius-besar);
+    padding:24px;display:flex;flex-direction:column;gap:8px;
+    box-shadow:0 22px 44px -38px rgba(29,58,49,.9);
+    transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;
+  }
+  .materi li:hover{transform:translateY(-6px);border-color:var(--aksen);box-shadow:0 30px 46px -34px rgba(29,58,49,.55)}
+  .materi-atas{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
+  .ikon{
+    width:48px;height:48px;border-radius:16px;display:grid;place-items:center;
+    font-size:20px;font-weight:800;
+    background:color-mix(in srgb,var(--aksen) 22%,#fff);color:var(--abu-900);
+    border:1.5px solid color-mix(in srgb,var(--aksen) 45%,#fff);
+  }
+  .jml{
+    font-size:13px;font-weight:700;white-space:nowrap;
+    background:color-mix(in srgb,var(--aksen) 18%,#fff);
+    color:var(--abu-900);padding:5px 11px;border-radius:999px;
+  }
+  .materi h3{margin:0;font-size:19px;color:var(--hijau-900);line-height:1.3}
+  .materi p{margin:0;color:var(--abu-600);font-size:15px}
+
+  .paket{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:34px}
+  .paket a{
+    display:block;padding:24px 26px;border-radius:18px;text-decoration:none;
+    background:#fff;border:1.5px solid var(--abu-100);color:var(--hijau-900);
+    font-weight:800;font-size:19px;letter-spacing:-.01em;
+    box-shadow:0 22px 44px -38px rgba(29,58,49,.9);
+    transition:transform .2s ease,border-color .2s ease;
+  }
+  .paket a:hover{transform:translateY(-5px);border-color:var(--hijau-700)}
+  .paket small{display:block;font-weight:500;font-size:14px;color:var(--abu-600);margin-top:4px;letter-spacing:0}
+  .paket a.utama{background:var(--hijau-700);border-color:transparent;color:#fff}
+  .paket a.utama small{color:var(--hijau-200)}
+  .paket a.utama:hover{background:var(--hijau-900)}
+
+  /* keunggulan */
+  .unggul{background:linear-gradient(180deg,var(--hijau-900),#152b25);color:#fff}
+  .unggul h2.judul{color:#fff}
+  .unggul .sub{color:#c3d6cb}
+  .kolom{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .kolom > div{
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.1);
+    border-top:3px solid var(--aksen);
+    border-radius:20px;padding:26px;
+    transition:transform .2s ease,background .2s ease;
+  }
+  .kolom > div:hover{transform:translateY(-6px);background:rgba(255,255,255,.08)}
+  .kolom .no{font-size:13px;font-weight:800;color:var(--aksen);letter-spacing:.1em}
+  .kolom h3{margin:10px 0 10px;font-size:20px}
+  .kolom p{margin:0;color:#c3d6cb;font-size:16px}
+
+  /* ajakan */
+  .ajakan{position:relative;overflow:hidden;text-align:center;background:var(--hijau-100);border-block:1px solid var(--hijau-200)}
+  .ajakan::before{
+    content:"";position:absolute;inset:0;
+    background-image:radial-gradient(circle at 1px 1px,rgba(47,93,75,.16) 1px,transparent 0);
+    background-size:24px 24px;
+  }
+  .ajakan .isi{position:relative;max-width:52ch;margin:0 auto}
+  .ajakan p{color:var(--abu-600);margin:0 auto 26px;font-size:18px}
+  .ajakan .btn{margin-top:6px}
+
+  /* kontak */
+  .kontak .wrap{display:grid;grid-template-columns:1fr 1.1fr;gap:56px;align-items:start}
+  form{display:grid;gap:14px;background:#fff;border:1.5px solid var(--abu-100);padding:26px;border-radius:var(--radius-besar);box-shadow:0 24px 48px -40px rgba(29,58,49,.9)}
+  label{font-weight:700;font-size:15px;display:grid;gap:7px;color:var(--hijau-900)}
+  input,textarea{
+    font-size:16px;padding:13px 15px;border:1.5px solid var(--abu-300);
+    border-radius:14px;background:#fff;color:var(--abu-900);
+    transition:border-color .15s ease,box-shadow .15s ease;
+  }
+  input::placeholder,textarea::placeholder{color:#9aa19e}
+  input:focus,textarea:focus{outline:none;border-color:var(--hijau-700);box-shadow:0 0 0 4px var(--hijau-200)}
+  textarea{min-height:130px;resize:vertical}
+  .terkirim{display:none;padding:15px 17px;background:var(--hijau-100);border-radius:14px;color:var(--hijau-900);font-weight:700;font-size:15px}
+  .terkirim.tampil{display:block}
+
+  footer{background:#fff;border-top:1px solid var(--abu-100);padding:30px 0;color:var(--abu-600);font-size:14px}
+  footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+  @media (max-width:900px){
+    .hero-grid,.kontak .wrap{grid-template-columns:1fr;gap:44px}
+    .kolom{grid-template-columns:1fr;gap:16px}
+    section{padding:64px 0}
+    .deco-3{display:none}
+  }
+  @media (max-width:640px){
+    .nav ul{gap:16px}
+    .nav-cta{display:none}
+    .ringkas li{font-size:14px}
+    h1{margin-top:16px}
+    .lead{font-size:17px}
+  }
+</style>
+
+<script>
+  import { animate, inView, scroll, stagger } from "motion";
+
+  const kurangGerak = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reveal = Array.from(document.querySelectorAll<HTMLElement>(".reveal"));
+
+  function tampilkan(el: HTMLElement, options: Record<string, unknown> = {}) {
+    animate(el, { opacity: 1, y: 0 }, { duration: 0.7, ease: [0.16, 1, 0.3, 1], ...options });
+  }
+
+  if (kurangGerak) {
+    reveal.forEach((el) => {
+      el.style.opacity = "1";
+      el.style.transform = "none";
+    });
+    document.querySelectorAll<HTMLElement>("[data-angka]").forEach((el) => {
+      el.textContent = el.dataset.angka ?? el.textContent;
+    });
+  } else {
+    const hero = document.querySelector<HTMLElement>(".hero-teks");
+    const heroReveal = hero ? Array.from(hero.querySelectorAll<HTMLElement>(".reveal")) : [];
+
+    animate("header", { y: [-70, 0], opacity: [0, 1] }, { duration: 0.6, ease: [0.16, 1, 0.3, 1] });
+
+    animate(
+      heroReveal,
+      { opacity: [0, 1], y: [26, 0] },
+      { delay: stagger(0.09, { startDelay: 0.05 }), duration: 0.75, ease: [0.16, 1, 0.3, 1] },
+    );
+
+    const kartuKuis = document.querySelector<HTMLElement>(".hero-kuis");
+    if (kartuKuis) {
+      animate(
+        kartuKuis,
+        { opacity: [0, 1], y: [34, 0], rotate: [-3, 0], scale: [0.96, 1] },
+        { duration: 0.9, delay: 0.25, ease: [0.16, 1, 0.3, 1] },
+      );
+    }
+
+    animate(".deco-1", { y: [0, -22, 0], scale: [1, 1.08, 1] }, { duration: 7, repeat: Infinity, ease: "easeInOut" });
+    animate(".deco-2", { y: [0, 18, 0], rotate: [0, 40, 0] }, { duration: 9, repeat: Infinity, ease: "easeInOut" });
+    animate(".deco-3", { rotate: [18, 34, 18], y: [0, -14, 0] }, { duration: 6, repeat: Infinity, ease: "easeInOut" });
+
+    reveal
+      .filter((el) => !el.closest(".hero") && !el.closest(".reveal-group"))
+      .forEach((el) => {
+        inView(
+          el,
+          () => {
+            tampilkan(el);
+          },
+          { amount: 0.25, margin: "0px 0px -8% 0px" },
+        );
+      });
+
+    document.querySelectorAll<HTMLElement>(".reveal-group").forEach((grup) => {
+      const anak = Array.from(grup.querySelectorAll<HTMLElement>(".reveal"));
+      inView(
+        grup,
+        () => {
+          animate(
+            anak,
+            { opacity: [0, 1], y: [26, 0] },
+            { delay: stagger(0.08), duration: 0.65, ease: [0.16, 1, 0.3, 1] },
+          );
+        },
+        { amount: 0.2, margin: "0px 0px -8% 0px" },
+      );
+    });
+
+    document.querySelectorAll<HTMLElement>("[data-angka]").forEach((el) => {
+      const target = Number(el.dataset.angka ?? "0");
+      inView(
+        el,
+        () => {
+          animate(0, target, {
+            duration: 1.2,
+            ease: [0.16, 1, 0.3, 1],
+            onUpdate: (v) => {
+              el.textContent = String(Math.round(v));
+            },
+          });
+        },
+        { amount: 0.6 },
+      );
+    });
+
+    const heroSection = document.querySelector<HTMLElement>(".hero");
+    if (heroSection) {
+      scroll(animate(".warp-1", { y: [-40, 90] }, { ease: "linear" }), {
+        target: heroSection,
+        offset: ["start start", "end start"],
+      });
+      scroll(animate(".warp-2", { y: [-20, 70] }, { ease: "linear" }), {
+        target: heroSection,
+        offset: ["start start", "end start"],
+      });
+    }
+  }
+
+  const form = document.getElementById("form") as HTMLFormElement | null;
+  const terkirim = document.getElementById("terkirim");
+
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+    // Hubungkan ke layanan/backend kamu di sini (mis. Formspree atau API sendiri).
+    terkirim?.classList.add("tampil");
+    form.reset();
+    if (terkirim && !kurangGerak) {
+      animate(terkirim, { opacity: [0, 1], y: [12, 0], scale: [0.97, 1] }, { duration: 0.5, ease: [0.16, 1, 0.3, 1] });
+    }
+  });
+</script>

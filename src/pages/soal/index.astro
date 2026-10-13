@@ -1,0 +1,324 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { PAKET } from "../../lib/soal";
+
+const daftar = Object.values(PAKET);
+---
+
+<Layout title="Latihan Soal — TKAku" description="Pilih paket latihan TKA Matematika: 25 soal per paket dengan pembahasan lengkap.">
+  <header class="bar">
+    <a class="logo" href="/">TKAku</a>
+    <nav class="nav">
+      <a href="/">Beranda</a>
+      <a class="aktif" href="/soal/">Latihan</a>
+    </nav>
+  </header>
+
+  <main class="bungkus">
+    <section class="judul reveal">
+      <p class="label">Latihan soal &amp; pembahasan</p>
+      <h1>Uji pemahamanmu,<br /><em>langsung dengan pembahasan.</em></h1>
+      <p class="lead">25 soal per paket, kunci jawaban, dan langkah penyelesaian lengkap. Kerjakan sesukamu — jawabanmu tersimpan, jadi bisa lanjut kapan saja.</p>
+    </section>
+
+    <section class="paket-grid">
+      {daftar.map((p) => (
+        <a class="kartu reveal" href={`/soal/${p.slug}/`}>
+          <div class="kartu-kepala">
+            <span class={`chip ${p.slug}`}>{p.slug === "wajib" ? "Wajib" : "Lanjut"}</span>
+            <span class="jumlah">25 soal</span>
+          </div>
+          <h2>{p.judul}</h2>
+          <p>{p.deskripsi}</p>
+          <ul class="poin">
+            <li>Pilihan ganda, ganda, Benar/Salah, sampai isian</li>
+            <li>Pembahasan langkah demi langkah</li>
+            <li>Bisa dilanjutkan kapan saja</li>
+          </ul>
+          <span class="cta">Mulai kerjakan <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg></span>
+        </a>
+      ))}
+    </section>
+
+    <section class="tips reveal">
+      <h3>Cara pakainya gampang</h3>
+      <ol>
+        <li><b>Pilih paket</b> — Wajib untuk dasar, Lanjut untuk yang siap naik level.</li>
+        <li><b>Jawab di layar</b> — pilihan ganda bisa langsung diklik; yang ganda &amp; Benar/Salah tinggal centang lalu periksa.</li>
+        <li><b>Buka pembahasan</b> — muncul otomatis setelah kamu menjawab, boleh juga dibuka kapan saja.</li>
+        <li><b>Lanjut kapan saja</b> — nomor soal &amp; jawabanmu tersimpan di perangkat ini.</li>
+      </ol>
+    </section>
+  </main>
+
+  <footer class="kaki">
+    <span>TKAku — teman latihan TKA Matematika</span>
+    <a href="/">Ke beranda</a>
+  </footer>
+</Layout>
+
+<script>
+  import { animate, inView } from "motion";
+
+  const kurangGerak = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (kurangGerak) {
+    document.querySelectorAll<HTMLElement>(".reveal").forEach((el) => {
+      el.style.opacity = "1";
+      el.style.transform = "none";
+    });
+  } else {
+    inView(
+      ".reveal",
+      (el) => {
+        animate(el as HTMLElement, { opacity: [0, 1], y: [22, 0] }, { duration: 0.65, ease: [0.16, 1, 0.3, 1] });
+        return () => {};
+      },
+      { margin: "0px 0px -6% 0px" },
+    );
+  }
+</script>
+
+<style>
+  .bar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 18px;
+    background: rgba(252, 250, 245, 0.86);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(20, 33, 61, 0.07);
+  }
+
+  .logo {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.35rem;
+    color: var(--ink);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+  }
+
+  .nav {
+    display: flex;
+    gap: 6px;
+  }
+
+  .nav a {
+    text-decoration: none;
+    color: var(--ink-soft);
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 8px 14px;
+    border-radius: 999px;
+  }
+
+  .nav a.aktif {
+    background: var(--brand);
+    color: #fff;
+  }
+
+  .bungkus {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 28px 18px 40px;
+    display: grid;
+    gap: 34px;
+  }
+
+  .judul h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.9rem, 5.4vw, 3.1rem);
+    line-height: 1.06;
+    letter-spacing: -0.03em;
+    margin: 10px 0 14px;
+    color: var(--ink);
+  }
+
+  .judul h1 em {
+    font-style: normal;
+    color: var(--brand);
+  }
+
+  .label {
+    display: inline-block;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--brand);
+    background: rgba(47, 93, 75, 0.1);
+    padding: 6px 12px;
+    border-radius: 999px;
+  }
+
+  .lead {
+    max-width: 54ch;
+    color: var(--ink-soft);
+    font-size: 1.02rem;
+    line-height: 1.65;
+  }
+
+  .paket-grid {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 760px) {
+    .paket-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .kartu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 24px 22px 22px;
+    border-radius: 22px;
+    background: #fff;
+    border: 1px solid rgba(20, 33, 61, 0.08);
+    box-shadow: 0 20px 40px -34px rgba(20, 33, 61, 0.45);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+
+  .kartu:hover {
+    transform: translateY(-4px);
+    border-color: rgba(47, 93, 75, 0.35);
+    box-shadow: 0 28px 50px -30px rgba(47, 93, 75, 0.4);
+  }
+
+  .kartu-kepala {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .chip {
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 999px;
+  }
+
+  .chip.wajib {
+    background: rgba(47, 93, 75, 0.12);
+    color: var(--hijau-700);
+  }
+
+  .chip.lanjut {
+    background: rgba(91, 169, 228, 0.16);
+    color: #1d6fa5;
+  }
+
+  .jumlah {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+
+  .kartu h2 {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    letter-spacing: -0.02em;
+    margin: 2px 0 0;
+    color: var(--ink);
+  }
+
+  .kartu p {
+    color: var(--ink-soft);
+    line-height: 1.6;
+    font-size: 0.97rem;
+    margin: 0;
+  }
+
+  .poin {
+    margin: 4px 0 8px;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 7px;
+  }
+
+  .poin li {
+    position: relative;
+    padding-left: 26px;
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+  }
+
+  .poin li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.42em;
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
+    background: rgba(47, 93, 75, 0.18);
+    box-shadow: inset 0 0 0 3px var(--brand);
+  }
+
+  .cta {
+    margin-top: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 800;
+    color: var(--brand);
+  }
+
+  .tips {
+    background: #fff;
+    border: 1px solid rgba(20, 33, 61, 0.08);
+    border-radius: 22px;
+    padding: 22px 22px 24px;
+  }
+
+  .tips h3 {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    margin: 0 0 12px;
+    color: var(--ink);
+  }
+
+  .tips ol {
+    margin: 0;
+    padding-left: 20px;
+    display: grid;
+    gap: 10px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
+
+  .tips b {
+    color: var(--ink);
+  }
+
+  .kaki {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 22px 18px 40px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    border-top: 1px solid rgba(20, 33, 61, 0.07);
+  }
+
+  .kaki a {
+    color: var(--brand);
+    font-weight: 700;
+  }
+</style>

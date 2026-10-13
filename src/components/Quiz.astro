@@ -1,0 +1,281 @@
+---
+---
+
+<div class="kuis" id="kuis" aria-live="polite">
+  <div class="kuis-atas">
+    <span class="kuis-label">Coba satu soal dulu yuk</span>
+    <span class="skor" id="skor">Skor 0</span>
+  </div>
+
+  <div class="progres" aria-hidden="true"><i id="progres"></i></div>
+
+  <p class="nomor" id="nomor"></p>
+  <h2 id="tanya"></h2>
+  <div class="opsi" id="opsi"></div>
+
+  <div class="bahas" id="bahas"></div>
+
+  <div class="kuis-bawah" id="bawah">
+    <button type="button" id="lanjut">Soal berikutnya</button>
+  </div>
+
+  <div class="konfeti" id="konfeti" aria-hidden="true"></div>
+</div>
+
+<style>
+  .kuis{
+    position:relative;
+    background:#fff;
+    border:1.5px solid var(--abu-100);
+    border-radius:24px;
+    padding:26px;
+    box-shadow:var(--shadow-kartu);
+  }
+
+  .kuis-atas{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+
+  .kuis-label{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:13px;font-weight:700;color:var(--hijau-700);
+    background:var(--hijau-100);border-radius:999px;padding:6px 13px;
+  }
+  .kuis-label::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--mint)}
+
+  .skor{
+    font-size:13px;font-weight:800;color:#3d2c00;
+    background:var(--kuning);border-radius:999px;padding:6px 13px;
+    display:inline-block;
+  }
+
+  .progres{height:7px;border-radius:999px;background:var(--abu-50);overflow:hidden;margin-bottom:16px}
+  .progres i{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,var(--mint),var(--hijau-700))}
+
+  .nomor{margin:0 0 8px;font-size:13px;font-weight:700;color:var(--abu-600);letter-spacing:.02em;text-transform:uppercase}
+
+  .kuis h2{font-size:18px;line-height:1.55;margin:0 0 18px;font-weight:600;color:var(--abu-900)}
+
+  .opsi{display:grid;gap:9px}
+  .opsi :global(button){
+    font:inherit;text-align:left;padding:13px 16px;
+    border:1.5px solid var(--abu-300);background:#fff;border-radius:14px;
+    cursor:pointer;color:var(--abu-900);display:flex;gap:12px;align-items:center;
+    transition:border-color .15s ease,background .15s ease,transform .15s ease;
+  }
+  .opsi :global(button b){
+    flex:none;width:26px;height:26px;border-radius:9px;
+    display:grid;place-items:center;font-size:13px;
+    background:var(--abu-50);color:var(--hijau-700);
+  }
+  .opsi :global(button:hover:not(:disabled)){border-color:var(--hijau-500);background:var(--hijau-100);transform:translateX(3px)}
+  .opsi :global(button:disabled){cursor:default}
+  .opsi :global(button.benar){background:var(--hijau-100);border-color:var(--hijau-700)}
+  .opsi :global(button.benar b){background:var(--hijau-700);color:#fff}
+  .opsi :global(button.salah){background:var(--salah-bg);border-color:var(--salah)}
+  .opsi :global(button.salah b){background:var(--salah);color:#fff}
+
+  .bahas{
+    display:none;margin-top:16px;padding:16px;
+    background:var(--abu-50);border-left:4px solid var(--hijau-500);
+    border-radius:10px;font-size:15px;
+  }
+  .bahas.tampil{display:block}
+  .bahas :global(.status){font-weight:800;margin:0 0 6px;color:var(--hijau-700);font-size:15px}
+  .bahas :global(.status.x){color:var(--salah)}
+  .bahas :global(ol){margin:8px 0 0;padding-left:20px}
+  .bahas :global(li){margin-bottom:4px}
+
+  .kuis-bawah{margin-top:14px;display:none;justify-content:flex-end}
+  .kuis-bawah.tampil{display:flex}
+  .kuis-bawah button{
+    font:inherit;font-weight:700;font-size:15px;color:#fff;
+    background:var(--hijau-700);border:0;cursor:pointer;
+    padding:11px 20px;border-radius:999px;
+    transition:background .15s ease,transform .15s ease;
+  }
+  .kuis-bawah button:hover{background:var(--hijau-900);transform:translateY(-2px)}
+
+  .konfeti{position:absolute;inset:0;pointer-events:none;overflow:visible}
+  .konfeti :global(i){position:absolute;left:50%;top:38%;width:9px;height:9px;border-radius:2px;display:block}
+
+  @media (max-width:520px){
+    .kuis{padding:20px}
+    .kuis h2{font-size:16.5px}
+    .kuis-atas{flex-wrap:wrap}
+  }
+</style>
+
+<script>
+  import { animate, stagger } from "motion";
+
+  type Soal = { t: string; o: string[]; b: number; p: string[] };
+
+  const daftarSoal: Soal[] = [
+    {
+      t: "Sebuah kotak berisi 60 angpao: 15 kupon Rp25.000, 12 kupon Rp50.000, 10 set sendok-garpu, dan 8 pemanas air. Sisanya kosong. Berapa peluang mengambil angpao yang kosong?",
+      o: ["1/15", "1/5", "1/4", "1/3", "5/11"],
+      b: 2,
+      p: [
+        "Angpao berhadiah: 15 + 12 + 10 + 8 = 45.",
+        "Angpao kosong: 60 − 45 = 15.",
+        "Peluang kosong = 15/60 = 1/4.",
+      ],
+    },
+    {
+      t: "Peningkatan suhu dimodelkan y = 0,02x − 39,9 dengan x tahun. Pada tahun berapa peningkatan suhu mencapai 0,7 °C?",
+      o: ["Tahun 2000", "Tahun 2003", "Tahun 2025", "Tahun 2030", "Tahun 2345"],
+      b: 3,
+      p: [
+        "Substitusi y = 0,7: 0,02x − 39,9 = 0,7.",
+        "0,02x = 40,6.",
+        "x = 40,6 / 0,02 = 2.030.",
+      ],
+    },
+    {
+      t: "A = {x | x < 6, x bilangan asli}, B = {x | x bilangan genap, x bilangan cacah}, C = {x | x ≤ 10, x bilangan prima}. Hasil dari (A ∩ B) ∪ C adalah ...",
+      o: [
+        "{2, 3, 5, 7}",
+        "{0, 2, 3, 5, 7}",
+        "{2, 3, 4, 5, 7}",
+        "{0, 2, 3, 4, 5, 7}",
+        "{2, 3, 4, 5, 7, 10}",
+      ],
+      b: 2,
+      p: [
+        "A = {1, 2, 3, 4, 5}, bilangan asli dimulai dari 1.",
+        "B = {0, 2, 4, 6, ...}, bilangan genap cacah dimulai dari 0.",
+        "C = {2, 3, 5, 7}, prima yang kurang dari atau sama dengan 10.",
+        "A ∩ B = {2, 4}.",
+        "(A ∩ B) ∪ C = {2, 3, 4, 5, 7}.",
+      ],
+    },
+  ];
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const $nomor = el<HTMLElement>("nomor");
+  const $tanya = el<HTMLElement>("tanya");
+  const $opsi = el<HTMLElement>("opsi");
+  const $bahas = el<HTMLElement>("bahas");
+  const $bawah = el<HTMLElement>("bawah");
+  const $lanjut = el<HTMLButtonElement>("lanjut");
+  const $skor = el<HTMLElement>("skor");
+  const $progres = el<HTMLElement>("progres");
+  const $konfeti = el<HTMLElement>("konfeti");
+  const $kuis = el<HTMLElement>("kuis");
+
+  const kurangGerak = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  let index = 0;
+  let skor = 0;
+
+  const umpanBalik = ["Mantap!", "Keren banget!", "Hebat, paham!", "Sip, tepat sekali!"];
+  const penyemangat = [
+    "Belum tepat, tapi semangat!",
+    "Hampir! Coba lihat pembahasannya ya.",
+    "Gapapa, dari salah jadi paham.",
+  ];
+
+  function tampil() {
+    const s = daftarSoal[index];
+
+    $nomor.textContent = `Soal ${index + 1} dari ${daftarSoal.length}`;
+    $tanya.textContent = s.t;
+    $bahas.className = "bahas";
+    $bahas.innerHTML = "";
+    $bawah.className = "kuis-bawah";
+    $opsi.innerHTML = "";
+
+    s.o.forEach((teks, k) => {
+      const bt = document.createElement("button");
+      bt.type = "button";
+      const huruf = document.createElement("b");
+      huruf.textContent = "ABCDE"[k];
+      const isi = document.createElement("span");
+      isi.textContent = teks;
+      bt.append(huruf, isi);
+      bt.addEventListener("click", () => jawab(k, bt));
+      $opsi.appendChild(bt);
+    });
+
+    animate($progres, { width: `${((index + 1) / daftarSoal.length) * 100}%` }, { duration: kurangGerak ? 0 : 0.6, ease: [0.16, 1, 0.3, 1] });
+
+    if (!kurangGerak) {
+      animate(
+        Array.from($opsi.children),
+        { opacity: [0, 1], y: [14, 0] },
+        { delay: stagger(0.06), duration: 0.45, ease: [0.16, 1, 0.3, 1] },
+      );
+      animate($tanya, { opacity: [0, 1], y: [10, 0] }, { duration: 0.4, ease: [0.16, 1, 0.3, 1] });
+    }
+  }
+
+  function jawab(k: number, tombol: HTMLButtonElement) {
+    const s = daftarSoal[index];
+    const semua = Array.from($opsi.children) as HTMLButtonElement[];
+
+    semua.forEach((bt, n) => {
+      bt.disabled = true;
+      if (n === s.b) bt.classList.add("benar");
+    });
+
+    const benar = k === s.b;
+    if (!benar) tombol.classList.add("salah");
+
+    if (benar) {
+      skor += 1;
+      $skor.textContent = `Skor ${skor}`;
+      if (!kurangGerak) {
+        animate($skor, { scale: [1, 1.22, 1] }, { duration: 0.5, ease: "easeOut" });
+        animate(tombol, { scale: [1, 1.04, 1] }, { duration: 0.45, ease: "easeOut" });
+      }
+      buangKonfeti();
+    } else if (!kurangGerak) {
+      animate(tombol, { x: [0, -7, 7, -5, 5, 0] }, { duration: 0.45, ease: "easeInOut" });
+    }
+
+    const judul = benar
+      ? `${umpanBalik[Math.floor(Math.random() * umpanBalik.length)]}`
+      : `${penyemangat[Math.floor(Math.random() * penyemangat.length)]} Jawaban yang benar: ${"ABCDE"[s.b]}.`;
+
+    $bahas.innerHTML = `<p class="status${benar ? "" : " x"}">${judul}</p><ol>${s.p
+      .map((langkah) => `<li>${langkah}</li>`)
+      .join("")}</ol>`;
+    $bahas.classList.add("tampil");
+    $bawah.classList.add("tampil");
+
+    if (!kurangGerak) {
+      animate($bahas, { opacity: [0, 1], y: [12, 0] }, { duration: 0.45, delay: 0.08, ease: [0.16, 1, 0.3, 1] });
+      animate($bawah, { opacity: [0, 1], y: [8, 0] }, { duration: 0.4, delay: 0.14, ease: [0.16, 1, 0.3, 1] });
+    }
+  }
+
+  function buangKonfeti() {
+    if (kurangGerak) return;
+    const warna = ["#ffc94d", "#ff7a59", "#5ba9e4", "#9b8afb", "#5ec4a6", "#4f8b6f"];
+    for (let n = 0; n < 18; n++) {
+      const bit = document.createElement("i");
+      bit.style.background = warna[n % warna.length];
+      bit.style.borderRadius = n % 3 === 0 ? "50%" : "2px";
+      $konfeti.appendChild(bit);
+      const x = (Math.random() - 0.5) * 260;
+      const y = -70 - Math.random() * 110;
+      const putar = Math.random() * 720 - 360;
+      animate(
+        bit,
+        { x: [0, x], y: [0, y, 150], opacity: [1, 1, 0], rotate: [0, putar], scale: [0.5, 1, 0.6] },
+        { duration: 1 + Math.random() * 0.5, ease: ["easeOut", "easeIn"], onComplete: () => bit.remove() },
+      );
+    }
+  }
+
+  $lanjut.addEventListener("click", () => {
+    index = (index + 1) % daftarSoal.length;
+    if (kurangGerak) {
+      tampil();
+      return;
+    }
+    animate($kuis, { opacity: [1, 0.35, 1] }, { duration: 0.35, ease: "easeInOut" });
+    tampil();
+  });
+
+  tampil();
+</script>

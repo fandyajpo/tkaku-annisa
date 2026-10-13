@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TKAku – Latihan Soal TKA dengan Pembahasan Lengkap</title>
+<meta name="description" content="Latihan soal TKA Matematika SMA/MA/SMK 2025 dengan kunci jawaban dan pembahasan langkah demi langkah.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --hijau-900:#1d3a31; --hijau-700:#2f5d4b; --hijau-500:#4f8b6f; --hijau-200:#cfe3d7; --hijau-100:#e6f0ea;
+  --abu-900:#262b29; --abu-600:#5b6360; --abu-300:#d5d9d7; --abu-100:#eceeed; --abu-50:#f6f7f6;
+  --salah:#9a4a3c; --salah-bg:#f6e8e4;
+  --radius:10px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--abu-900);background:#fff;line-height:1.65;font-size:17px}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--hijau-500);outline-offset:3px;border-radius:4px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+/* nav */
+header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--abu-100)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px;color:var(--hijau-900);text-decoration:none;letter-spacing:-.02em}
+.logo i{width:26px;height:26px;border-radius:8px 8px 8px 2px;background:var(--hijau-700);display:inline-block}
+.nav ul{display:flex;gap:28px;list-style:none;margin:0;padding:0}
+.nav ul a{text-decoration:none;color:var(--abu-600);font-weight:500;font-size:15px}
+.nav ul a:hover{color:var(--hijau-700)}
+
+/* tombol */
+.btn{display:inline-block;padding:13px 24px;border-radius:var(--radius);font-weight:600;font-size:16px;text-decoration:none;border:2px solid transparent;cursor:pointer;font-family:inherit}
+.btn-utama{background:var(--hijau-700);color:#fff}
+.btn-utama:hover{background:var(--hijau-900)}
+.btn-lain{background:transparent;color:var(--hijau-700);border-color:var(--hijau-200)}
+.btn-lain:hover{border-color:var(--hijau-700)}
+
+/* hero */
+.hero{background:var(--abu-50);border-bottom:1px solid var(--abu-100)}
+.hero .wrap{display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:center;padding-top:72px;padding-bottom:80px}
+h1{font-size:clamp(34px,5vw,54px);line-height:1.1;letter-spacing:-.03em;margin:0 0 20px;color:var(--hijau-900);font-weight:800}
+.hero p.lead{font-size:19px;color:var(--abu-600);margin:0 0 32px;max-width:46ch}
+.aksi{display:flex;flex-wrap:wrap;gap:12px}
+.slogan{margin-top:28px;font-size:14px;color:var(--abu-600)}
+
+/* kuis contoh */
+.kuis{background:#fff;border:1px solid var(--abu-300);border-radius:16px;padding:26px;box-shadow:0 14px 34px -22px rgba(29,58,49,.45)}
+.kuis-atas{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:14px;color:var(--abu-600)}
+.kuis-atas strong{color:var(--hijau-700)}
+.kuis h2{font-size:18px;line-height:1.5;margin:0 0 16px;font-weight:600}
+.opsi{display:grid;gap:8px}
+.opsi button{font:inherit;text-align:left;padding:12px 16px;border:1.5px solid var(--abu-300);background:#fff;border-radius:var(--radius);cursor:pointer;color:var(--abu-900);display:flex;gap:12px}
+.opsi button b{color:var(--hijau-700);min-width:18px}
+.opsi button:hover:not(:disabled){border-color:var(--hijau-500);background:var(--hijau-100)}
+.opsi button:disabled{cursor:default}
+.opsi button.benar{background:var(--hijau-100);border-color:var(--hijau-700)}
+.opsi button.salah{background:var(--salah-bg);border-color:var(--salah)}
+.bahas{display:none;margin-top:16px;padding:16px;background:var(--abu-50);border-left:4px solid var(--hijau-500);border-radius:6px;font-size:15px}
+.bahas.tampil{display:block}
+.bahas .status{font-weight:800;margin:0 0 6px;color:var(--hijau-700)}
+.bahas .status.x{color:var(--salah)}
+.bahas ol{margin:6px 0 0;padding-left:20px}
+.kuis-bawah{margin-top:16px;display:none;justify-content:flex-end}
+.kuis-bawah.tampil{display:flex}
+.kuis-bawah button{font:inherit;font-weight:600;color:var(--hijau-700);background:none;border:0;cursor:pointer;padding:6px 2px}
+
+/* bagian umum */
+section{padding:84px 0}
+h2.judul{font-size:clamp(26px,3.4vw,36px);letter-spacing:-.02em;line-height:1.2;margin:0 0 12px;color:var(--hijau-900);font-weight:800}
+.sub{color:var(--abu-600);margin:0 0 44px;max-width:56ch}
+
+/* ringkas */
+.ringkas{padding:30px 0;border-bottom:1px solid var(--abu-100)}
+.ringkas ul{display:flex;flex-wrap:wrap;gap:12px 40px;list-style:none;margin:0;padding:0;color:var(--abu-600);font-size:16px}
+.ringkas li b{color:var(--hijau-900)}
+
+/* materi */
+.materi{list-style:none;margin:0;padding:0;border-top:1px solid var(--abu-300)}
+.materi li{display:grid;grid-template-columns:200px 1fr auto;gap:24px;align-items:center;padding:22px 4px;border-bottom:1px solid var(--abu-300)}
+.materi h3{margin:0;font-size:19px;color:var(--hijau-900)}
+.materi p{margin:0;color:var(--abu-600);font-size:15px}
+.materi .jml{font-size:14px;color:var(--hijau-700);font-weight:600;white-space:nowrap}
+.paket{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
+.paket a{padding:12px 20px;border:1.5px solid var(--hijau-200);border-radius:var(--radius);text-decoration:none;color:var(--hijau-900);font-weight:600;background:var(--hijau-100)}
+.paket a:hover{border-color:var(--hijau-700)}
+.paket small{display:block;font-weight:400;color:var(--abu-600)}
+
+/* keunggulan */
+.unggul{background:var(--hijau-900);color:#fff}
+.unggul h2.judul{color:#fff}
+.unggul .sub{color:#c3d6cb}
+.kolom{display:grid;grid-template-columns:repeat(3,1fr);gap:40px}
+.kolom h3{margin:0 0 10px;font-size:20px}
+.kolom p{margin:0;color:#c3d6cb;font-size:16px}
+.kolom div{border-top:2px solid var(--hijau-500);padding-top:18px}
+
+/* ajakan */
+.ajakan{text-align:center;background:var(--hijau-100)}
+.ajakan p{color:var(--abu-600);margin:0 auto 28px;max-width:48ch}
+
+/* kontak */
+.kontak .wrap{display:grid;grid-template-columns:1fr 1.1fr;gap:56px}
+form{display:grid;gap:14px}
+label{font-weight:600;font-size:15px;display:grid;gap:6px}
+input,textarea{font:inherit;padding:12px 14px;border:1.5px solid var(--abu-300);border-radius:var(--radius);background:#fff;color:var(--abu-900)}
+input:focus,textarea:focus{outline:none;border-color:var(--hijau-700);box-shadow:0 0 0 3px var(--hijau-200)}
+textarea{min-height:130px;resize:vertical}
+.terkirim{display:none;padding:14px 16px;background:var(--hijau-100);border-radius:var(--radius);color:var(--hijau-900);font-weight:600}
+.terkirim.tampil{display:block}
+footer{background:var(--abu-50);border-top:1px solid var(--abu-100);padding:28px 0;color:var(--abu-600);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+@media (max-width:860px){
+  .hero .wrap,.kontak .wrap{grid-template-columns:1fr;gap:40px}
+  .kolom{grid-template-columns:1fr;gap:28px}
+  .materi li{grid-template-columns:1fr;gap:6px}
+  .nav ul{gap:16px}
+  section{padding:60px 0}
+}
+@media (max-width:520px){ .nav ul li:nth-child(2){display:none} }
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#"><i aria-hidden="true"></i>TKAku</a>
+    <nav aria-label="Menu utama">
+      <ul>
+        <li><a href="#materi">Materi</a></li>
+        <li><a href="#keunggulan">Keunggulan</a></li>
+        <li><a href="#kontak">Kontak</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+<div class="hero">
+  <div class="wrap">
+    <div>
+      <h1>Latihan soal TKA, lengkap dengan pembahasan</h1>
+      <p class="lead">Soal TKA Matematika SMA/MA/SMK 2025 dengan kunci jawaban dan pembahasan langkah demi langkah, supaya kamu paham caranya, bukan sekadar hafal jawabannya.</p>
+      <div class="aksi">
+        <a class="btn btn-utama" href="#materi">Mulai latihan</a>
+        <a class="btn btn-lain" href="#keunggulan">Lihat keunggulan</a>
+      </div>
+      <p class="slogan">Empowering Communities Through Education</p>
+    </div>
+
+    <div class="kuis" id="kuis" aria-live="polite">
+      <div class="kuis-atas"><span>Coba satu soal</span><strong id="nomor"></strong></div>
+      <h2 id="tanya"></h2>
+      <div class="opsi" id="opsi"></div>
+      <div class="bahas" id="bahas"></div>
+      <div class="kuis-bawah" id="bawah"><button type="button" id="lanjut">Soal berikutnya</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="ringkas">
+  <div class="wrap">
+    <ul>
+      <li><b>50 soal</b> dalam 2 paket</li>
+      <li><b>5 materi</b> utama</li>
+      <li>Pembahasan <b>langkah demi langkah</b></li>
+      <li>Bisa dibuka dari HP</li>
+    </ul>
+  </div>
+</div>
+
+<section id="materi">
+  <div class="wrap">
+    <h2 class="judul">Pilih materi yang ingin dilatih</h2>
+    <p class="sub">Mulai dari topik yang paling kamu butuhkan. Setiap soal punya kunci jawaban dan pembahasan.</p>
+    <ul class="materi">
+      <li><h3>Bilangan</h3><p>Himpunan, bilangan berpangkat, dan operasi bilangan.</p><span class="jml">3 soal</span></li>
+      <li><h3>Aljabar</h3><p>Fungsi, barisan dan deret, pertidaksamaan, matriks, dan polinomial.</p><span class="jml">17 soal</span></li>
+      <li><h3>Geometri dan Pengukuran</h3><p>Sudut, bangun datar dan ruang, vektor, lingkaran, dan transformasi.</p><span class="jml">21 soal</span></li>
+      <li><h3>Data dan Peluang</h3><p>Membaca diagram, ukuran pemusatan, pencacahan, dan peluang.</p><span class="jml">5 soal</span></li>
+      <li><h3>Kalkulus</h3><p>Limit fungsi aljabar dan trigonometri.</p><span class="jml">4 soal</span></li>
+    </ul>
+    <div class="paket">
+      <a href="#">Paket Wajib (Umum)<small>25 soal</small></a>
+      <a href="#">Paket Tingkat Lanjut<small>25 soal</small></a>
+    </div>
+  </div>
+</section>
+
+<section class="unggul" id="keunggulan">
+  <div class="wrap">
+    <h2 class="judul">Belajar jadi lebih terarah</h2>
+    <p class="sub">Dibuat untuk siswa dan guru yang ingin berlatih dengan materi yang jelas.</p>
+    <div class="kolom">
+      <div><h3>Bimbingan personal</h3><p>Mentoring yang disesuaikan dengan kebutuhan siswa dan guru dalam mengatasi tantangan akademik yang rumit.</p></div>
+      <div><h3>Materi berkualitas</h3><p>Sumber belajar yang sesuai mata pelajaran, dirancang untuk mendukung belajar seumur hidup dan perkembangan karier.</p></div>
+      <div><h3>Dukungan ahli</h3><p>Bimbingan ahli dan bantuan teknis agar kegiatan belajar berjalan lancar di semua perangkat dan platform.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="ajakan">
+  <div class="wrap">
+    <h2 class="judul">Siap berlatih hari ini?</h2>
+    <p>Pilih satu paket, kerjakan, lalu cocokkan dengan pembahasannya.</p>
+    <a class="btn btn-utama" href="#materi">Mulai latihan</a>
+  </div>
+</section>
+
+<section class="kontak" id="kontak">
+  <div class="wrap">
+    <div>
+      <h2 class="judul">Komentar dan saran</h2>
+      <p class="sub">Menemukan soal yang salah, pembahasan yang kurang jelas, atau punya ide untuk TKAku? Tulis di sini, kami akan membacanya dengan senang hati.</p>
+    </div>
+    <form id="form" novalidate>
+      <label>Nama<input type="text" name="nama" autocomplete="name" required></label>
+      <label>Email<input type="email" name="email" autocomplete="email" required></label>
+      <label>Pesan<textarea name="pesan" required></textarea></label>
+      <button class="btn btn-utama" type="submit">Kirim masukan</button>
+      <div class="terkirim" id="terkirim" role="status">Terima kasih, masukanmu sudah kami terima.</div>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap"><span>© 2026 TKAku</span><span>Empowering Communities Through Education</span></div>
+</footer>
+
+<script>
+const soal = [
+  { t:"Sebuah kotak berisi 60 angpao: 15 kupon Rp25.000, 12 kupon Rp50.000, 10 set sendok-garpu, dan 8 pemanas air. Sisanya kosong. Berapa peluang mengambil angpao yang kosong?",
+    o:["1/15","1/5","1/4","1/3","5/11"], b:2,
+    p:["Angpao berhadiah: 15 + 12 + 10 + 8 = 45.","Angpao kosong: 60 − 45 = 15.","Peluang kosong = 15/60 = 1/4."] },
+  { t:"Peningkatan suhu dimodelkan y = 0,02x − 39,9 dengan x tahun. Pada tahun berapa peningkatan suhu mencapai 0,7 °C?",
+    o:["Tahun 2000","Tahun 2003","Tahun 2025","Tahun 2030","Tahun 2345"], b:3,
+    p:["Substitusi y = 0,7: 0,02x − 39,9 = 0,7.","0,02x = 40,6.","x = 40,6 / 0,02 = 2.030."] }
+];
+let i = 0;
+const $ = id => document.getElementById(id);
+function tampil(){
+  const s = soal[i];
+  $("nomor").textContent = "Soal " + (i+1) + " dari " + soal.length;
+  $("tanya").textContent = s.t;
+  $("bahas").className = "bahas"; $("bawah").className = "kuis-bawah";
+  $("opsi").innerHTML = "";
+  s.o.forEach((teks, k) => {
+    const bt = document.createElement("button");
+    bt.type = "button";
+    bt.innerHTML = "<b>" + "ABCDE"[k] + ".</b><span></span>";
+    bt.lastChild.textContent = teks;
+    bt.onclick = () => jawab(k);
+    $("opsi").appendChild(bt);
+  });
+}
+function jawab(k){
+  const s = soal[i], tombol = $("opsi").children;
+  [...tombol].forEach((bt, n) => { bt.disabled = true; if(n === s.b) bt.classList.add("benar"); });
+  if(k !== s.b) tombol[k].classList.add("salah");
+  const ok = k === s.b;
+  $("bahas").innerHTML = '<p class="status' + (ok ? '' : ' x') + '">' + (ok ? 'Benar!' : 'Belum tepat. Jawaban yang benar: ' + "ABCDE"[s.b] + '.') + '</p><ol>' + s.p.map(x => '<li>' + x + '</li>').join("") + '</ol>';
+  $("bahas").classList.add("tampil"); $("bawah").classList.add("tampil");
+}
+$("lanjut").onclick = () => { i = (i + 1) % soal.length; tampil(); };
+tampil();
+
+$("form").addEventListener("submit", e => {
+  e.preventDefault();
+  const f = e.target;
+  if(!f.checkValidity()){ f.reportValidity(); return; }
+  // Hubungkan ke layanan/backend kamu di sini (mis. Formspree atau API sendiri).
+  $("terkirim").classList.add("tampil"); f.reset();
+});
+</script>
+</body>
+</html>

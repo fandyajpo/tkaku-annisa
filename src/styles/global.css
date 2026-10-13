@@ -1,0 +1,59 @@
+:root{
+  --hijau-900:#1d3a31; --hijau-700:#2f5d4b; --hijau-500:#4f8b6f; --hijau-200:#cfe3d7; --hijau-100:#e6f0ea;
+  --abu-900:#262b29; --abu-600:#5b6360; --abu-300:#d5d9d7; --abu-100:#eceeed; --abu-50:#f6f7f6;
+  --salah:#9a4a3c; --salah-bg:#f6e8e4;
+  --kuning:#ffc94d; --koral:#ff7a59; --langit:#5ba9e4; --ungu:#9b8afb; --mint:#5ec4a6;
+  --krem:#fffdf7;
+  --radius:12px;
+  --radius-besar:20px;
+  --shadow-kartu:0 26px 50px -34px rgba(29,58,49,.75);
+  --font-display:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --ink:#262b29; --ink-soft:#5b6360; --brand:#2f5d4b;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+
+body{
+  margin:0;
+  font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  color:var(--abu-900);
+  background:var(--krem);
+  line-height:1.65;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+}
+
+a{color:inherit}
+button,input,textarea{font-family:inherit}
+
+:focus-visible{outline:3px solid var(--hijau-500);outline-offset:3px;border-radius:6px}
+
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 26px;border-radius:999px;font-weight:700;font-size:16px;
+  text-decoration:none;border:2px solid transparent;cursor:pointer;
+  transition:transform .18s ease,background .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(0)}
+
+.btn-utama{background:var(--hijau-700);color:#fff;box-shadow:0 14px 26px -16px rgba(29,58,49,.95)}
+.btn-utama:hover{background:var(--hijau-900)}
+
+.btn-lain{background:#fff;color:var(--hijau-700);border-color:var(--hijau-200)}
+.btn-lain:hover{border-color:var(--hijau-700)}
+
+.btn-kuning{background:var(--kuning);color:#3d2c00;box-shadow:0 14px 26px -16px rgba(155,110,0,.8)}
+.btn-kuning:hover{background:#ffbe2e}
+
+.js .reveal{opacity:0;transform:translateY(22px)}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .js .reveal{opacity:1;transform:none}
+  .btn:hover{transform:none}
+}
