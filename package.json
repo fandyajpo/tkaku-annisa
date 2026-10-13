@@ -13,7 +13,10 @@
   },
   "dependencies": {
     "astro": "^7.3.8",
-    "motion": "^14.1.0"
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
+    "motion": "^14.1.0",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",

@@ -412,6 +412,7 @@ const keunggulan = [
 
 <script>
   import { animate, inView, scroll, stagger } from "motion";
+  import { track } from "../scripts/analytics";
 
   const kurangGerak = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const reveal = Array.from(document.querySelectorAll<HTMLElement>(".reveal"));
@@ -510,6 +511,25 @@ const keunggulan = [
     }
   }
 
+  document.querySelectorAll<HTMLAnchorElement>('a[href="/soal/"]').forEach((a) => {
+    a.addEventListener("click", () => {
+      const lokasi = a.closest(".nav") ? "nav" : a.closest(".ajakan") ? "ajakan" : "hero";
+      track("cta_mulai_latihan", { lokasi });
+    });
+  });
+
+  document.querySelectorAll<HTMLAnchorElement>(".nav ul a").forEach((a) => {
+    a.addEventListener("click", () => {
+      track("klik_nav", { item: a.textContent?.trim().toLowerCase() ?? "" });
+    });
+  });
+
+  document.querySelectorAll<HTMLAnchorElement>(".paket a").forEach((a) => {
+    a.addEventListener("click", () => {
+      track("klik_paket", { paket: a.href.includes("wajib") ? "wajib" : "lanjut" });
+    });
+  });
+
   const form = document.getElementById("form") as HTMLFormElement | null;
   const terkirim = document.getElementById("terkirim");
 
@@ -519,6 +539,7 @@ const keunggulan = [
       form.reportValidity();
       return;
     }
+    track("submit_masukan");
     // Hubungkan ke layanan/backend kamu di sini (mis. Formspree atau API sendiri).
     terkirim?.classList.add("tampil");
     form.reset();

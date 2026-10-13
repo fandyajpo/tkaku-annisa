@@ -106,6 +106,7 @@
 
 <script>
   import { animate, stagger } from "motion";
+  import { track } from "../scripts/analytics";
 
   type Soal = { t: string; o: string[]; b: number; p: string[] };
 
@@ -218,6 +219,7 @@
     });
 
     const benar = k === s.b;
+    track("kuis_demo_jawab", { no_soal: index + 1, pilihan: "ABCDE"[k], benar });
     if (!benar) tombol.classList.add("salah");
 
     if (benar) {
@@ -268,6 +270,7 @@
   }
 
   $lanjut.addEventListener("click", () => {
+    track("kuis_demo_lanjut", { no_soal: index + 1 });
     index = (index + 1) % daftarSoal.length;
     if (kurangGerak) {
       tampil();

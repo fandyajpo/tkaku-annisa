@@ -59,8 +59,15 @@ const daftar = Object.values(PAKET);
 
 <script>
   import { animate, inView } from "motion";
+  import { track } from "../../scripts/analytics";
 
   const kurangGerak = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  document.querySelectorAll<HTMLAnchorElement>(".kartu").forEach((a) => {
+    a.addEventListener("click", () => {
+      track("pilih_paket", { paket: a.href.includes("wajib") ? "wajib" : "lanjut" });
+    });
+  });
 
   if (kurangGerak) {
     document.querySelectorAll<HTMLElement>(".reveal").forEach((el) => {

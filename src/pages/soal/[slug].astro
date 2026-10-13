@@ -53,6 +53,14 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
       <p class="skor" id="skor"></p>
       <div class="peta-grid" id="peta-grid"></div>
       <p class="selesai-pesan" id="selesai-pesan" hidden></p>
+      <div class="unduh" id="unduh" hidden>
+        <p class="unduh-judul">Download hasil</p>
+        <div class="unduh-aksi">
+          <button id="unduh-pdf" type="button">PDF</button>
+          <button id="unduh-xlsx" type="button">Excel</button>
+        </div>
+        <p class="unduh-status" id="unduh-status" hidden></p>
+      </div>
       <button class="ulang" id="ulang" type="button">Ulangi dari awal</button>
     </aside>
     <div class="tirai" id="tirai" hidden></div>
@@ -413,6 +421,56 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
     color: var(--salah);
     font-weight: 700;
     cursor: pointer;
+  }
+
+  .unduh {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--abu-200, #e5e7eb);
+  }
+
+  .unduh-judul {
+    margin: 0 0 8px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .unduh-aksi {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .unduh-aksi button {
+    padding: 10px 8px;
+    border-radius: 12px;
+    border: 1px solid var(--hijau-200);
+    background: #fff;
+    color: var(--hijau-700);
+    font: inherit;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .unduh-aksi button:hover {
+    background: var(--hijau-100);
+    border-color: var(--hijau-500);
+  }
+
+  .unduh-aksi button:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .unduh-status {
+    margin: 8px 0 0;
+    font-size: 0.8rem;
+    color: var(--ink-soft);
   }
 
   .navigasi {
@@ -788,6 +846,7 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
   import { animate, stagger } from "motion";
   import type { Isi, Soal } from "../../lib/soal";
   import { sfx } from "../../scripts/sfx";
+  import { track } from "../../scripts/analytics";
 
   const el = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
   const data = JSON.parse(el("paket-data").textContent ?? "{}") as {
@@ -824,6 +883,10 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
   const tirai = el("tirai");
   const ulangBtn = el("ulang");
   const suaraBtn = el<HTMLButtonElement>("suara");
+  const unduhBox = el("unduh");
+  const unduhPdfBtn = el<HTMLButtonElement>("unduh-pdf");
+  const unduhXlsxBtn = el<HTMLButtonElement>("unduh-xlsx");
+  const unduhStatus = el("unduh-status");
 
   let idx = 0;
   let jawab: Record<number, number[]> = {};
@@ -958,8 +1021,10 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
     b.addEventListener("click", () => {
       sfx.klik();
       const buka = $bahas.hidden;
-      if (buka) bukaPembahasan(false);
-      else $bahas.hidden = true;
+      if (buka) {
+        bukaPembahasan(false);
+        track("buka_pembahasan", { paket: slug, no: soalList[idx].no });
+      } else $bahas.hidden = true;
       b.textContent = buka ? "Tutup pembahasan" : "Lihat pembahasan";
     });
     $aksi.append(b);
@@ -968,6 +1033,7 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
   function tombolCobaLagi(soal: Soal) {
     const b = tombolAksi("Coba lagi", "lain");
     b.addEventListener("click", () => {
+      track("coba_lagi", { paket: slug, no: soal.no });
       delete jawab[soal.no];
       simpan();
       sfx.klik();
@@ -980,6 +1046,13 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
     jawab[soal.no] = p;
     simpan();
     const hasil = evaluasi(soal, p);
+    track("soal_dijawab", {
+      paket: slug,
+      no: soal.no,
+      topik: soal.topik,
+      tipe: soal.tipe,
+      hasil,
+    });
     tampil(0, false);
     if (hasil === "benar") {
       sfx.benar();
@@ -993,7 +1066,10 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
       umpanBlok("netral", "Soal ini tidak punya kunci otomatis — cocokkan jawabanmu dengan pembahasan, ya.");
     }
     bukaPembahasan(true);
-    renderPeta();
+    const s = renderPeta();
+    if (s.kosong === 0) {
+      track("paket_selesai", { paket: slug, skor_benar: s.benar, total });
+    }
   }
 
   function renderPilihan(soal: Soal, pilihan: number[] | undefined) {
@@ -1105,6 +1181,7 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
     if (!pilihan) {
       const b = tombolAksi("Lihat pembahasan & jawaban", "utama");
       b.addEventListener("click", () => {
+        track("buka_pembahasan", { paket: slug, no: soal.no });
         jawab[soal.no] = [0];
         simpan();
         sfx.klik();
@@ -1173,6 +1250,7 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
       b.setAttribute("aria-label", `Soal ${soal.no}${hasil !== "kosong" ? `, ${hasil}` : ""}`);
       b.addEventListener("click", () => {
         sfx.klik();
+        track("navigasi_soal", { paket: slug, arah: "peta" });
         tutupLembar();
         const arah = i > idx ? 1 : -1;
         idx = i;
@@ -1183,6 +1261,7 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
 
     const terjawab = total - skor.kosong;
     $skor.innerHTML = `<b>Benar: ${skor.benar}</b> · Salah ${skor.salah} · Terjawab ${terjawab}/${total}`;
+    unduhBox.hidden = terjawab === 0;
     const semua = terjawab === total;
     $selesaiPesan.hidden = !semua;
     if (semua) {
@@ -1194,6 +1273,7 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
       }
     }
     if (animasi && !kurangGerak) animate([...petaGrid.children], { opacity: [0, 1], scale: [0.85, 1] }, { delay: stagger(0.012) });
+    return skor;
   }
 
   function bukaLembar() {
@@ -1201,6 +1281,253 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
     tirai.hidden = false;
     renderPeta(true);
   }
+
+  function hitungSkor() {
+    const s = { benar: 0, salah: 0, netral: 0, kosong: 0 };
+    soalList.forEach((soal) => {
+      const p = jawab[soal.no];
+      s[p ? evaluasi(soal, p) : "kosong"]++;
+    });
+    return s;
+  }
+
+  function tanggalIndo() {
+    return new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+  }
+
+  function fileTanggal() {
+    const d = new Date();
+    const p = (n: number) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  }
+
+  function teksJawaban(soal: Soal, p: number[]): string {
+    if (soal.tipe === "teks") return "—";
+    if (soal.tipe === "pernyataan") {
+      const v = verdictOpsi(soal);
+      return soal.items.map((it, i) => `${it.label}: ${v[p[i]] ?? "—"}`).join("; ");
+    }
+    return p.map((i) => soal.opsi[i]?.huruf ?? "—").join(", ");
+  }
+
+  function teksKunci(soal: Soal): string {
+    if (soal.tipe === "teks") return soal.kunciTeks || "—";
+    if (soal.tipe === "pernyataan") {
+      return soal.items.map((it) => `${it.label}: ${it.kunci}`).join("; ");
+    }
+    return soal.benar.map((i) => soal.opsi[i]?.huruf ?? "—").join(", ");
+  }
+
+  function tipePendek(soal: Soal): string {
+    if (soal.tipe === "teks") return "Isian";
+    if (soal.tipe === "pernyataan") return "B/S";
+    if (soal.tanpaKunci) return "PG manual";
+    return soal.banyakPilihanGanda ? "PG ganda" : "PG";
+  }
+
+  function langkahTeks(soal: Soal): string {
+    return soal.langkah
+      .map(
+        (l) =>
+          (l.nomor ? `Langkah ${l.nomor}: ` : "") +
+          l.isi.map((b) => ("teks" in b ? b.teks : b.tabel.join(" | "))).join(" "),
+      )
+      .join("\n");
+  }
+
+  function pendek(t: string, n = 42): string {
+    return t.length > n ? t.slice(0, n - 1) + "…" : t;
+  }
+
+  async function unduhPDF() {
+    const [{ jsPDF }, { autoTable }] = await Promise.all([import("jspdf"), import("jspdf-autotable")]);
+    const doc = new jsPDF({ unit: "mm", format: "a4" });
+    const lebar = doc.internal.pageSize.getWidth();
+    const s = hitungSkor();
+    const terjawab = total - s.kosong;
+    const persen = total ? Math.round((s.benar / total) * 100) : 0;
+
+    doc.setFillColor(47, 93, 75);
+    doc.rect(0, 0, lebar, 30, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.text("TKAku", 14, 15);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text("Hasil Latihan TKA Matematika", 14, 22);
+    doc.text(tanggalIndo(), lebar - 14, 15, { align: "right" });
+    doc.text(data.meta.judul, lebar - 14, 22, { align: "right" });
+
+    let y = 42;
+    doc.setTextColor(38, 43, 41);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.text(`Skor: ${s.benar}/${total} (${persen}%)`, 14, y);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(107, 114, 112);
+    doc.text(`Terjawab ${terjawab} dari ${total} soal`, 14, y + 6);
+
+    y += 14;
+    const kotak = [
+      { label: "Benar", nilai: s.benar, bg: [232, 245, 233] as const, fg: [46, 125, 50] as const },
+      { label: "Salah", nilai: s.salah, bg: [253, 236, 234] as const, fg: [198, 40, 40] as const },
+      { label: "Netral", nilai: s.netral, bg: [227, 242, 253] as const, fg: [21, 101, 192] as const },
+      { label: "Belum", nilai: s.kosong, bg: [245, 245, 245] as const, fg: [117, 117, 117] as const },
+    ];
+    const celah = 3;
+    const lebarKotak = (lebar - 28 - celah * 3) / 4;
+    kotak.forEach((k, i) => {
+      const x = 14 + i * (lebarKotak + celah);
+      doc.setFillColor(k.bg[0], k.bg[1], k.bg[2]);
+      doc.roundedRect(x, y, lebarKotak, 18, 2.5, 2.5, "F");
+      doc.setTextColor(k.fg[0], k.fg[1], k.fg[2]);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.text(String(k.nilai), x + 4, y + 9);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.text(k.label.toUpperCase(), x + 4, y + 14);
+    });
+
+    const baris = soalList.map((soal) => {
+      const p = jawab[soal.no];
+      const hasil = p ? evaluasi(soal, p) : "kosong";
+      const labelHasil = hasil === "kosong" ? "Belum" : hasil === "benar" ? "Benar" : hasil === "salah" ? "Salah" : "Netral";
+      return [
+        String(soal.no),
+        soal.topik,
+        tipePendek(soal),
+        p ? pendek(teksJawaban(soal, p), 40) : "—",
+        pendek(teksKunci(soal), 34),
+        labelHasil,
+      ];
+    });
+
+    autoTable(doc, {
+      startY: y + 26,
+      head: [["No", "Topik", "Tipe", "Jawabanmu", "Kunci", "Hasil"]],
+      body: baris,
+      theme: "grid",
+      styles: {
+        font: "helvetica",
+        fontSize: 8.5,
+        cellPadding: 1.8,
+        textColor: [51, 58, 56],
+        lineColor: [226, 232, 230],
+        lineWidth: 0.1,
+      },
+      headStyles: { fillColor: [47, 93, 75], textColor: [255, 255, 255], fontStyle: "bold" },
+      columnStyles: {
+        0: { cellWidth: 10, halign: "center" },
+        2: { cellWidth: 20 },
+        5: { cellWidth: 16, halign: "center", fontStyle: "bold" },
+      },
+      didParseCell: (data) => {
+        if (data.section !== "body" || data.column.index !== 5) return;
+        const t = String(data.cell.raw);
+        if (t === "Benar") data.cell.styles.textColor = [46, 125, 50];
+        else if (t === "Salah") data.cell.styles.textColor = [198, 40, 40];
+        else if (t === "Belum") data.cell.styles.textColor = [150, 150, 150];
+        else data.cell.styles.textColor = [21, 101, 192];
+      },
+    });
+
+    const halaman = doc.getNumberOfPages();
+    for (let i = 1; i <= halaman; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(160, 160, 160);
+      doc.text(`TKAku · ${data.meta.judul} · halaman ${i} dari ${halaman}`, lebar / 2, doc.internal.pageSize.getHeight() - 8, {
+        align: "center",
+      });
+    }
+
+    doc.save(`tkaku-hasil-${slug}-${fileTanggal()}.pdf`);
+  }
+
+  async function unduhExcel() {
+    const XLSX = await import("xlsx");
+    const s = hitungSkor();
+    const terjawab = total - s.kosong;
+    const persen = total ? Math.round((s.benar / total) * 100) : 0;
+
+    const wb = XLSX.utils.book_new();
+
+    const ringkasan = [
+      ["TKAku — Hasil Latihan TKA Matematika"],
+      [],
+      ["Paket", data.meta.judul],
+      ["Tanggal", tanggalIndo()],
+      ["Total soal", total],
+      ["Terjawab", terjawab],
+      ["Benar", s.benar],
+      ["Salah", s.salah],
+      ["Netral", s.netral],
+      ["Belum dijawab", s.kosong],
+      ["Skor", `${s.benar}/${total}`],
+      ["Persentase", `${persen}%`],
+    ];
+    const ws1 = XLSX.utils.aoa_to_sheet(ringkasan);
+    ws1["!cols"] = [{ wch: 16 }, { wch: 34 }];
+    XLSX.utils.book_append_sheet(wb, ws1, "Ringkasan");
+
+    const detail: (string | number)[][] = [["No", "Topik", "Tipe", "Jawabanmu", "Kunci", "Hasil"]];
+    const pembahasan: (string | number)[][] = [["No", "Topik", "Kunci", "Pembahasan langkah demi langkah"]];
+    soalList.forEach((soal) => {
+      const p = jawab[soal.no];
+      const hasil = p ? evaluasi(soal, p) : "kosong";
+      detail.push([
+        soal.no,
+        soal.topik,
+        tipeLabel(soal),
+        p ? teksJawaban(soal, p) : "—",
+        teksKunci(soal),
+        hasil === "kosong" ? "Belum" : hasil,
+      ]);
+      pembahasan.push([soal.no, soal.topik, teksKunci(soal), langkahTeks(soal)]);
+    });
+    const ws2 = XLSX.utils.aoa_to_sheet(detail);
+    ws2["!cols"] = [{ wch: 5 }, { wch: 26 }, { wch: 20 }, { wch: 34 }, { wch: 30 }, { wch: 8 }];
+    XLSX.utils.book_append_sheet(wb, ws2, "Detail Soal");
+
+    const ws3 = XLSX.utils.aoa_to_sheet(pembahasan);
+    ws3["!cols"] = [{ wch: 5 }, { wch: 26 }, { wch: 30 }, { wch: 80 }];
+    XLSX.utils.book_append_sheet(wb, ws3, "Pembahasan");
+
+    XLSX.writeFile(wb, `tkaku-hasil-${slug}-${fileTanggal()}.xlsx`);
+  }
+
+  async function denganStatus(kerja: () => Promise<void>) {
+    unduhPdfBtn.disabled = true;
+    unduhXlsxBtn.disabled = true;
+    unduhStatus.hidden = false;
+    unduhStatus.textContent = "Menyiapkan file…";
+    try {
+      await kerja();
+      unduhStatus.textContent = "File berhasil diunduh.";
+    } catch (err) {
+      console.error(err);
+      unduhStatus.textContent = "Gagal membuat file. Coba lagi ya.";
+    } finally {
+      unduhPdfBtn.disabled = false;
+      unduhXlsxBtn.disabled = false;
+    }
+    setTimeout(() => {
+      unduhStatus.hidden = true;
+    }, 4000);
+  }
+
+  unduhPdfBtn.addEventListener("click", () => {
+    track("unduh_hasil", { paket: slug, format: "pdf" });
+    denganStatus(unduhPDF);
+  });
+
+  unduhXlsxBtn.addEventListener("click", () => {
+    track("unduh_hasil", { paket: slug, format: "xlsx" });
+    denganStatus(unduhExcel);
+  });
 
   function tutupLembar() {
     peta.classList.remove("terbuka");
@@ -1219,6 +1546,7 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
 
   ulangBtn.addEventListener("click", () => {
     if (!confirm("Hapus semua jawaban di paket ini dan mulai dari soal 1 lagi?")) return;
+    track("ulang_paket", { paket: slug });
     jawab = {};
     idx = 0;
     pernahSelesai = false;
@@ -1231,6 +1559,7 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
   $prev.addEventListener("click", () => {
     if (idx === 0) return;
     sfx.klik();
+    track("navigasi_soal", { paket: slug, arah: "prev" });
     idx -= 1;
     tampil(-1);
   });
@@ -1238,6 +1567,7 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
   $next.addEventListener("click", () => {
     if (idx === total - 1) return;
     sfx.klik();
+    track("navigasi_soal", { paket: slug, arah: "next" });
     idx += 1;
     tampil(1);
   });
