@@ -32,6 +32,12 @@ const {
       rel="stylesheet"
     />
     <script is:inline>
+      // sembunyikan badge "Powered by Netlify" untuk semua pengunjung
+      try {
+        localStorage.setItem("nl-hud:public:v1", "hidden");
+      } catch {}
+    </script>
+    <script is:inline>
       document.documentElement.classList.add("js");
     </script>
   </head>
