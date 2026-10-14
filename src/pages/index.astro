@@ -156,11 +156,11 @@ const keunggulan = [
         <div class="paket reveal-group">
           <a class="utama reveal" href="/soal/wajib/">
             Paket Wajib (Umum)
-            <small>25 soal · 45 menit</small>
+            <small>25 soal · 75 menit</small>
           </a>
           <a class="reveal" href="/soal/lanjut/">
             Paket Tingkat Lanjut
-            <small>25 soal · 45 menit</small>
+            <small>25 soal · 75 menit</small>
           </a>
         </div>
       </div>
@@ -210,7 +210,11 @@ const keunggulan = [
           </p>
         </div>
 
-        <form id="form" novalidate class="reveal">
+        <form id="form" name="kontak" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" novalidate class="reveal">
+          <input type="hidden" name="form-name" value="kontak" />
+          <p class="tersembunyi" aria-hidden="true">
+            <label>Jangan diisi: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+          </p>
           <label
             >Nama<input type="text" name="nama" autocomplete="name" required placeholder="Nama kamu" /></label
           >
@@ -223,6 +227,9 @@ const keunggulan = [
           <button class="btn btn-utama" type="submit">Kirim masukan</button>
           <div class="terkirim" id="terkirim" role="status">
             Terima kasih, masukanmu sudah kami terima. Sampai ketemu di latihan berikutnya!
+          </div>
+          <div class="gagal" id="gagal" role="status">
+            Hmm, pengiriman gagal. Coba lagi beberapa saat lagi ya.
           </div>
         </form>
       </div>
@@ -391,6 +398,9 @@ const keunggulan = [
   textarea{min-height:130px;resize:vertical}
   .terkirim{display:none;padding:15px 17px;background:var(--hijau-100);border-radius:14px;color:var(--hijau-900);font-weight:700;font-size:15px}
   .terkirim.tampil{display:block}
+  .gagal{display:none;padding:15px 17px;background:var(--salah-bg);border-radius:14px;color:var(--salah);font-weight:700;font-size:15px}
+  .gagal.tampil{display:block}
+  .tersembunyi{display:none}
 
   footer{background:#fff;border-top:1px solid var(--abu-100);padding:30px 0;color:var(--abu-600);font-size:14px}
   footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
@@ -532,19 +542,35 @@ const keunggulan = [
 
   const form = document.getElementById("form") as HTMLFormElement | null;
   const terkirim = document.getElementById("terkirim");
+  const gagal = document.getElementById("gagal");
 
-  form?.addEventListener("submit", (e) => {
+  form?.addEventListener("submit", async (e) => {
     e.preventDefault();
+    terkirim?.classList.remove("tampil");
+    gagal?.classList.remove("tampil");
     if (!form.checkValidity()) {
       form.reportValidity();
       return;
     }
-    track("submit_masukan");
-    // Hubungkan ke layanan/backend kamu di sini (mis. Formspree atau API sendiri).
-    terkirim?.classList.add("tampil");
-    form.reset();
-    if (terkirim && !kurangGerak) {
-      animate(terkirim, { opacity: [0, 1], y: [12, 0], scale: [0.97, 1] }, { duration: 0.5, ease: [0.16, 1, 0.3, 1] });
+    const isi = new FormData(form);
+    try {
+      const res = await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(
+          [...isi.entries()].map(([k, v]) => [k, String(v)]),
+        ).toString(),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      track("submit_masukan");
+      terkirim?.classList.add("tampil");
+      form.reset();
+      if (terkirim && !kurangGerak) {
+        animate(terkirim, { opacity: [0, 1], y: [12, 0], scale: [0.97, 1] }, { duration: 0.5, ease: [0.16, 1, 0.3, 1] });
+      }
+    } catch (err) {
+      console.error(err);
+      gagal?.classList.add("tampil");
     }
   });
 </script>
