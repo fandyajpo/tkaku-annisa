@@ -157,7 +157,7 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
   .bungkus {
     max-width: 1120px;
     margin: 0 auto;
-    padding: 18px 16px calc(104px + env(safe-area-inset-bottom));
+    padding: 18px 16px calc(150px + env(safe-area-inset-bottom));
     display: grid;
     gap: 20px;
     grid-template-columns: minmax(0, 1fr);
@@ -486,7 +486,7 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
     z-index: 50;
     display: flex;
     gap: 8px;
-    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+    padding: 10px 12px calc(56px + env(safe-area-inset-bottom));
     background: rgba(255, 253, 247, 0.94);
     backdrop-filter: blur(12px);
     border-top: 1px solid rgba(38, 43, 41, 0.08);
@@ -536,7 +536,7 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
     }
 
     .bungkus {
-      padding: 14px 12px calc(104px + env(safe-area-inset-bottom));
+      padding: 14px 12px calc(150px + env(safe-area-inset-bottom));
     }
 
     .kartu {
@@ -551,7 +551,7 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
 
   @media (min-width: 768px) {
     .bungkus {
-      padding: 26px 24px calc(110px + env(safe-area-inset-bottom));
+      padding: 26px 24px calc(156px + env(safe-area-inset-bottom));
     }
 
     .kartu {
@@ -1044,7 +1044,8 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
   }
 
   function tombolBahas(sudah: boolean) {
-    const b = tombolAksi(sudah ? "Tutup pembahasan" : "Lihat pembahasan", "lain");
+    if (!sudah) return;
+    const b = tombolAksi($bahas.hidden ? "Lihat pembahasan" : "Tutup pembahasan", "lain");
     b.addEventListener("click", () => {
       sfx.klik();
       const buka = $bahas.hidden;
