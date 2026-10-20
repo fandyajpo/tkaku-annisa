@@ -235,7 +235,10 @@ const keunggulan = [
           <label
             >Pesan<textarea name="pesan" required maxlength="2000" placeholder="Tulis masukanmu di sini..."></textarea></label
           >
-          <button class="btn btn-utama" type="submit">Kirim masukan</button>
+          <button class="btn btn-utama kirim" id="kirim" type="submit">
+            <span class="putar" aria-hidden="true"></span>
+            <span class="teks">Kirim masukan</span>
+          </button>
           <div class="terkirim" id="terkirim" role="status">
             Terima kasih, masukanmu sudah kami terima. Sampai ketemu di latihan berikutnya!
           </div>
@@ -422,6 +425,12 @@ const keunggulan = [
   .gagal{display:none;padding:15px 17px;background:var(--salah-bg);border-radius:14px;color:var(--salah);font-weight:700;font-size:15px}
   .gagal.tampil{display:block}
   .tersembunyi{display:none}
+
+  .kirim[disabled]{opacity:.7;cursor:progress;transform:none}
+  .kirim .putar{display:none;width:15px;height:15px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:putar .7s linear infinite}
+  .kirim.muat .putar{display:block}
+  @keyframes putar{to{transform:rotate(1turn)}}
+  @media (prefers-reduced-motion:reduce){.kirim.muat .putar{animation:none}}
 
   footer{background:#fff;border-top:1px solid var(--abu-100);padding:30px 0;color:var(--abu-600);font-size:14px}
   footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
@@ -612,6 +621,16 @@ const keunggulan = [
   const terkirim = document.getElementById("terkirim");
   const gagal = document.getElementById("gagal");
   const pesanGagalAwal = gagal?.textContent ?? "";
+  const kirim = document.getElementById("kirim") as HTMLButtonElement | null;
+  const teksKirim = kirim?.querySelector(".teks");
+  const labelAwalKirim = teksKirim?.textContent ?? "Kirim masukan";
+
+  function muat(on: boolean) {
+    if (!kirim) return;
+    kirim.disabled = on;
+    kirim.classList.toggle("muat", on);
+    if (teksKirim) teksKirim.textContent = on ? "Mengirim..." : labelAwalKirim;
+  }
 
   form?.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -622,6 +641,7 @@ const keunggulan = [
       return;
     }
     const isi = new FormData(form);
+    muat(true);
     try {
       const res = await fetch("/api/kontak", {
         method: "POST",
@@ -649,6 +669,8 @@ const keunggulan = [
       console.error(err);
       if (gagal) gagal.textContent = pesanGagalAwal;
       gagal?.classList.add("tampil");
+    } finally {
+      muat(false);
     }
   });
 </script>
