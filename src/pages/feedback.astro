@@ -1,0 +1,1037 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { kunciSah } from "../lib/feedback";
+
+export const prerender = false;
+
+if (!kunciSah(Astro.url.searchParams)) {
+  return new Response(
+    `<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>404 — TKAku</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;text-align:center;padding:24px;background:#fffdf7;color:#1d3a31;font-family:"Plus Jakarta Sans",system-ui,sans-serif}h1{font-size:clamp(56px,14vw,110px);letter-spacing:-.05em;margin:0;line-height:1}p{color:#5b6360;margin:14px 0 22px}a{color:#2f5d4b;font-weight:800;text-decoration:none;border-bottom:2px solid #cfe3d7;padding-bottom:2px}</style></head><body><div><h1>404</h1><p>Halaman tidak ditemukan.</p><a href="/">Ke beranda</a></div></body></html>`,
+    { status: 404, headers: { "Content-Type": "text/html; charset=utf-8" } },
+  );
+}
+---
+
+<Layout title="Feedback — TKAku" description="Daftar masukan yang dikirim lewat formulir kontak TKAku.">
+  <header>
+    <div class="wrap nav">
+      <a class="logo" href="/">
+        <span class="logo-mark" aria-hidden="true">T</span>
+        TKAku
+      </a>
+      <nav aria-label="Menu utama" id="nav-utama">
+        <ul>
+          <li><a href="/soal/">Latihan</a></li>
+          <li><a href="/#materi">Materi</a></li>
+          <li><a href="/#kontak">Kontak</a></li>
+          <li><a href="/feedback/" aria-current="page" class="aktif">Feedback</a></li>
+        </ul>
+      </nav>
+      <div class="nav-kanan">
+        <a class="btn btn-utama nav-cta" href="/soal/">Mulai latihan</a>
+        <button
+          class="nav-toggle"
+          id="nav-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="nav-utama"
+          aria-label="Buka menu"
+        >
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="kepala">
+      <div class="wrap">
+        <span class="eyebrow reveal">Admin · Data masukan</span>
+        <div class="kepala-baris">
+          <div class="kepala-teks reveal">
+            <h1>Masukan dari <em>siswa</em></h1>
+            <p class="sub">
+              Semua pesan dari formulir kontak, tersimpan rapi dan siap diunduh kapan saja.
+            </p>
+          </div>
+          <div class="aksi reveal">
+            <button class="btn btn-utama" id="unduh-csv" type="button" data-format="csv">
+              <span class="putar" aria-hidden="true"></span><span class="teks">CSV</span>
+            </button>
+            <button class="btn btn-lain" id="unduh-xlsx" type="button" data-format="xlsx">
+              <span class="putar" aria-hidden="true"></span><span class="teks">Excel</span>
+            </button>
+            <button class="btn btn-lain" id="unduh-pdf" type="button" data-format="pdf">
+              <span class="putar" aria-hidden="true"></span><span class="teks">PDF</span>
+            </button>
+          </div>
+        </div>
+        <p class="status-unduh" id="unduh-status" role="status" hidden></p>
+        <ul class="ringkas reveal">
+          <li>Total masukan <b id="stat-total">0</b></li>
+          <li>Halaman <b id="stat-halaman">1 / 1</b></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="daftar">
+      <div class="wrap">
+        <div class="kartu" id="kartu">
+          <div class="tabel-scroll" id="tabel-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th class="kol-no">No</th>
+                  <th class="kol-nama">Nama</th>
+                  <th class="kol-kelas">Kelas</th>
+                  <th class="kol-pesan">Pesan</th>
+                  <th class="kol-tgl">Dikirim</th>
+                </tr>
+              </thead>
+              <tbody id="isi"></tbody>
+            </table>
+          </div>
+          <div class="tutup-muat" id="memuat" role="status">
+            <span class="putar" aria-hidden="true"></span>
+            Memuat data…
+          </div>
+          <p class="kosong" id="kosong" hidden>Belum ada masukan yang masuk. Cek lagi nanti ya.</p>
+          <p class="galat" id="galat" hidden>Data gagal dimuat. Muat ulang halaman untuk coba lagi.</p>
+        </div>
+        <nav class="paginasi" id="paginasi" aria-label="Navigasi halaman" hidden></nav>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>© 2026 TKAku</span>
+      <span>Empowering Communities Through Education</span>
+    </div>
+  </footer>
+</Layout>
+
+<style>
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(255, 253, 247, 0.88);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--abu-100);
+  }
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    height: 70px;
+    position: relative;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--hijau-900);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+  }
+  .logo-mark {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px 12px 12px 4px;
+    background: linear-gradient(140deg, var(--hijau-500), var(--hijau-900));
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-size: 17px;
+    box-shadow: 0 10px 18px -12px rgba(29, 58, 49, 0.95);
+  }
+  .nav-kanan {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .nav ul {
+    display: flex;
+    gap: 26px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .nav ul a {
+    text-decoration: none;
+    color: var(--abu-600);
+    font-weight: 600;
+    font-size: 15px;
+    transition: color 0.15s ease;
+  }
+  .nav ul a:hover {
+    color: var(--hijau-700);
+  }
+  .nav ul a.aktif {
+    color: var(--hijau-700);
+    font-weight: 800;
+  }
+  .nav-cta {
+    padding: 10px 20px;
+    font-size: 15px;
+  }
+  .nav-toggle {
+    display: none;
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+    border: 1.5px solid var(--abu-100);
+    background: #fff;
+    cursor: pointer;
+    place-items: center;
+    gap: 4px;
+    padding: 0;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .nav-toggle span {
+    display: block;
+    width: 17px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--hijau-900);
+    transition: transform 0.25s ease, opacity 0.2s ease;
+  }
+  header.menu-buka .nav-toggle span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+  header.menu-buka .nav-toggle span:nth-child(2) {
+    opacity: 0;
+  }
+  header.menu-buka .nav-toggle span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  /* kepala */
+  .kepala {
+    padding: 58px 0 36px;
+    background: radial-gradient(760px 380px at 86% -30%, var(--hijau-100), transparent 64%), var(--krem);
+    border-bottom: 1px solid var(--abu-100);
+  }
+  .kepala-baris {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 26px;
+  }
+  .kepala-teks {
+    max-width: 56ch;
+  }
+  .eyebrow {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--hijau-700);
+    background: var(--hijau-100);
+    padding: 5px 13px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+  }
+  h1 {
+    font-size: clamp(30px, 4.6vw, 48px);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    margin: 0 0 12px;
+    color: var(--hijau-900);
+    font-weight: 800;
+  }
+  h1 em {
+    font-style: normal;
+    color: var(--hijau-700);
+    background-image: linear-gradient(transparent 60%, var(--kuning) 60%, var(--kuning) 92%, transparent 92%);
+    padding: 0 4px;
+    border-radius: 4px;
+  }
+  .sub {
+    color: var(--abu-600);
+    margin: 0;
+    font-size: 17px;
+  }
+  .aksi {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .aksi .btn {
+    padding: 12px 22px;
+    font-size: 15px;
+  }
+  .aksi .putar {
+    display: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: 2px solid rgba(47, 93, 75, 0.22);
+    border-top-color: var(--hijau-700);
+    animation: putar 0.7s linear infinite;
+  }
+  .aksi .btn-utama .putar {
+    border-color: rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+  }
+  .aksi .muat .putar {
+    display: block;
+  }
+  .aksi button[disabled] {
+    opacity: 0.72;
+    cursor: progress;
+    transform: none;
+  }
+  @keyframes putar {
+    to {
+      transform: rotate(1turn);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .aksi .putar {
+      animation: none;
+    }
+  }
+  .status-unduh {
+    margin: 16px 0 0;
+    display: inline-block;
+    padding: 11px 16px;
+    background: var(--hijau-100);
+    border-radius: 14px;
+    color: var(--hijau-900);
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .status-unduh[hidden] {
+    display: none;
+  }
+  .status-unduh.salah {
+    background: var(--salah-bg);
+    color: var(--salah);
+  }
+  .ringkas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    list-style: none;
+    margin: 24px 0 0;
+    padding: 0;
+  }
+  .ringkas li {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: #fff;
+    border: 1px solid var(--hijau-200);
+    padding: 9px 17px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--abu-600);
+    box-shadow: 0 12px 22px -20px rgba(29, 58, 49, 0.9);
+  }
+  .ringkas li b {
+    color: var(--hijau-900);
+    font-weight: 800;
+  }
+  .ringkas li::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 2px;
+    background: var(--hijau-500);
+    transform: rotate(45deg);
+  }
+
+  /* daftar */
+  .daftar {
+    padding: 40px 0 84px;
+  }
+  .kartu {
+    position: relative;
+    background: #fff;
+    border: 1.5px solid var(--abu-100);
+    border-radius: var(--radius-besar);
+    box-shadow: 0 24px 48px -40px rgba(29, 58, 49, 0.9);
+    overflow: hidden;
+  }
+  .tabel-scroll {
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    min-width: 700px;
+    border-collapse: collapse;
+  }
+  th {
+    background: var(--abu-50);
+    color: var(--hijau-900);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 14px 18px;
+    border-bottom: 1.5px solid var(--abu-100);
+    white-space: nowrap;
+  }
+  th.kol-no {
+    width: 58px;
+  }
+  th.kol-kelas {
+    width: 120px;
+  }
+  th.kol-tgl {
+    width: 168px;
+  }
+
+  #isi :global(tr) {
+    transition: background 0.15s ease;
+  }
+  #isi :global(tr:hover) {
+    background: #fbfdfc;
+  }
+  #isi :global(td) {
+    padding: 15px 18px;
+    border-bottom: 1px solid var(--abu-100);
+    font-size: 15px;
+    color: var(--abu-600);
+    vertical-align: top;
+  }
+  #isi :global(tr:last-child td) {
+    border-bottom: 0;
+  }
+  #isi :global(td.kol-no) {
+    font-weight: 800;
+    color: var(--abu-300);
+  }
+  #isi :global(td.kol-nama) {
+    font-weight: 800;
+    color: var(--hijau-900);
+    white-space: nowrap;
+  }
+  #isi :global(td.kol-kelas) {
+    white-space: nowrap;
+  }
+  #isi :global(td.kol-pesan) {
+    min-width: 280px;
+    max-width: 440px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  #isi :global(td.kol-tgl) {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tutup-muat {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(3px);
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--hijau-700);
+  }
+  .tutup-muat[hidden] {
+    display: none;
+  }
+  .tutup-muat .putar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 3px solid rgba(47, 93, 75, 0.18);
+    border-top-color: var(--hijau-700);
+    animation: putar 0.7s linear infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tutup-muat .putar {
+      animation: none;
+    }
+  }
+  .tabel-scroll[hidden],
+  .kosong[hidden],
+  .galat[hidden] {
+    display: none;
+  }
+  .kosong,
+  .galat {
+    margin: 0;
+    padding: 46px 20px;
+    text-align: center;
+    color: var(--abu-600);
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .galat {
+    color: var(--salah);
+  }
+
+  /* paginasi */
+  .paginasi {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 26px;
+  }
+  .paginasi[hidden] {
+    display: none;
+  }
+  .paginasi :global(button) {
+    min-width: 42px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: 1.5px solid var(--abu-100);
+    background: #fff;
+    color: var(--hijau-900);
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+  }
+  .paginasi :global(button:hover:not(:disabled)) {
+    border-color: var(--hijau-700);
+    color: var(--hijau-700);
+  }
+  .paginasi :global(button.aktif) {
+    background: var(--hijau-700);
+    border-color: var(--hijau-700);
+    color: #fff;
+  }
+  .paginasi :global(button:disabled) {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  .paginasi :global(.titik) {
+    padding: 10px 4px;
+    color: var(--abu-600);
+    font-weight: 700;
+  }
+
+  footer {
+    background: #fff;
+    border-top: 1px solid var(--abu-100);
+    padding: 30px 0;
+    color: var(--abu-600);
+    font-size: 14px;
+  }
+  footer .wrap {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 900px) {
+    .nav-toggle {
+      display: flex;
+    }
+    .nav ul {
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 0;
+      right: 0;
+      z-index: 60;
+      flex-direction: column;
+      gap: 2px;
+      padding: 10px;
+      background: #fff;
+      border: 1.5px solid var(--abu-100);
+      border-radius: 18px;
+      box-shadow: 0 26px 50px -28px rgba(29, 58, 49, 0.55);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.2s;
+    }
+    header.menu-buka .nav ul {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .nav ul a {
+      display: block;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 16px;
+    }
+    .nav ul a:hover {
+      background: var(--abu-50);
+    }
+    .kepala-baris {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+  @media (max-width: 720px) {
+    .tabel-scroll {
+      overflow: visible;
+    }
+    table {
+      min-width: 0;
+    }
+    thead {
+      display: none;
+    }
+    #isi :global(tr) {
+      display: block;
+      margin: 12px;
+      padding: 12px 14px;
+      background: #fff;
+      border: 1.5px solid var(--abu-100);
+      border-radius: 16px;
+    }
+    #isi :global(td) {
+      display: flex;
+      gap: 14px;
+      align-items: baseline;
+      padding: 5px 0;
+      border-bottom: 0;
+    }
+    #isi :global(td::before) {
+      content: attr(data-label);
+      flex-shrink: 0;
+      min-width: 74px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--hijau-700);
+    }
+    #isi :global(td.kol-pesan) {
+      display: -webkit-box;
+      min-width: 0;
+      max-width: none;
+      flex: 1;
+    }
+    #isi :global(td.kol-nama),
+    #isi :global(td.kol-kelas),
+    #isi :global(td.kol-tgl) {
+      white-space: normal;
+    }
+  }
+  @media (max-width: 640px) {
+    .nav-cta {
+      display: none;
+    }
+    h1 {
+      margin-top: 4px;
+    }
+    .sub {
+      font-size: 16px;
+    }
+    .aksi {
+      width: 100%;
+    }
+    .aksi .btn {
+      flex: 1 1 auto;
+    }
+    footer .wrap {
+      flex-direction: column;
+      gap: 6px;
+    }
+  }
+  @media (max-width: 560px) {
+    .kepala {
+      padding: 40px 0 28px;
+    }
+    .daftar {
+      padding: 26px 0 64px;
+    }
+    .ringkas li {
+      font-size: 14px;
+      padding: 8px 14px;
+    }
+    .paginasi :global(button) {
+      padding: 9px 13px;
+      font-size: 14px;
+    }
+  }
+</style>
+
+<script>
+  import { animate, inView } from "motion";
+  import { track } from "../scripts/analytics";
+
+  interface Baris {
+    id: number;
+    nama: string;
+    kelas: string;
+    pesan: string;
+    dikirim: string;
+  }
+  interface Jawaban {
+    ok?: boolean;
+    halaman?: number;
+    perHalaman?: number;
+    total?: number;
+    totalHalaman?: number;
+    baris?: Baris[];
+    pesan?: string;
+  }
+
+  const kunci = new URLSearchParams(location.search).get("key") ?? "";
+  const keApi = (q: string) => `/api/feedback?${q}${kunci ? `&key=${encodeURIComponent(kunci)}` : ""}`;
+
+  const tabelScroll = document.getElementById("tabel-scroll");
+  const muatBox = document.getElementById("memuat");
+  const kosongBox = document.getElementById("kosong");
+  const galatBox = document.getElementById("galat");
+  const tbody = document.getElementById("isi");
+  const paginasi = document.getElementById("paginasi");
+  const statTotal = document.getElementById("stat-total");
+  const statHalaman = document.getElementById("stat-halaman");
+  const statusUnduh = document.getElementById("unduh-status");
+
+  let halaman = 1;
+  let totalHalaman = 1;
+  let perHalaman = 10;
+  let sedangMuat = false;
+
+  type Mode = "muat" | "isi" | "kosong" | "galat";
+
+  function status(mode: Mode) {
+    if (muatBox) muatBox.hidden = mode !== "muat";
+    if (tabelScroll) tabelScroll.hidden = mode === "kosong" || mode === "galat";
+    if (kosongBox) kosongBox.hidden = mode !== "kosong";
+    if (galatBox) galatBox.hidden = mode !== "galat";
+  }
+
+  function tanggal(s: string): string {
+    const d = new Date(`${s.replace(" ", "T")}Z`);
+    if (Number.isNaN(d.getTime())) return s;
+    return d.toLocaleString("id-ID", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+
+  function sel(label: string, teks: string, kelas: string): HTMLTableCellElement {
+    const td = document.createElement("td");
+    td.dataset.label = label;
+    td.textContent = teks;
+    td.className = kelas;
+    return td;
+  }
+
+  function isiTabel(baris: Baris[]) {
+    if (!tbody) return;
+    tbody.replaceChildren();
+    baris.forEach((b, i) => {
+      const tr = document.createElement("tr");
+      const nomor = (halaman - 1) * perHalaman + i + 1;
+      const pesan = sel("Pesan", b.pesan, "kol-pesan");
+      pesan.title = b.pesan;
+      tr.append(
+        sel("No", String(nomor), "kol-no"),
+        sel("Nama", b.nama, "kol-nama"),
+        sel("Kelas", b.kelas, "kol-kelas"),
+        pesan,
+        sel("Dikirim", tanggal(b.dikirim), "kol-tgl"),
+      );
+      tbody.append(tr);
+    });
+  }
+
+  function tombol(teks: string, ke: number | null, ops: { aktif?: boolean; label?: string } = {}) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = teks;
+    if (ops.label) b.setAttribute("aria-label", ops.label);
+    if (ke === null) b.disabled = true;
+    if (ops.aktif) {
+      b.classList.add("aktif");
+      b.setAttribute("aria-current", "page");
+    }
+    if (ke !== null) b.addEventListener("click", () => void muat(ke));
+    return b;
+  }
+
+  function nomorHalaman(): (number | "…")[] {
+    const daftar: (number | "…")[] = [];
+    for (let i = 1; i <= totalHalaman; i++) {
+      if (i === 1 || i === totalHalaman || Math.abs(i - halaman) <= 1) daftar.push(i);
+      else if (daftar[daftar.length - 1] !== "…") daftar.push("…");
+    }
+    return daftar;
+  }
+
+  function renderPaginasi() {
+    if (!paginasi) return;
+    paginasi.replaceChildren();
+    if (totalHalaman <= 1) {
+      paginasi.hidden = true;
+      return;
+    }
+    paginasi.hidden = false;
+    paginasi.append(
+      tombol("← Sebelumnya", halaman > 1 ? halaman - 1 : null, { label: "Halaman sebelumnya" }),
+    );
+    for (const n of nomorHalaman()) {
+      if (n === "…") {
+        const titik = document.createElement("span");
+        titik.className = "titik";
+        titik.textContent = "…";
+        titik.setAttribute("aria-hidden", "true");
+        paginasi.append(titik);
+      } else {
+        paginasi.append(tombol(String(n), n, { aktif: n === halaman, label: `Halaman ${n}` }));
+      }
+    }
+    paginasi.append(
+      tombol("Berikutnya →", halaman < totalHalaman ? halaman + 1 : null, {
+        label: "Halaman berikutnya",
+      }),
+    );
+  }
+
+  async function muat(n: number) {
+    if (sedangMuat) return;
+    sedangMuat = true;
+    halaman = n;
+    status("muat");
+    try {
+      const r = await fetch(keApi(`halaman=${n}`));
+      const d = (await r.json().catch(() => null)) as Jawaban | null;
+      if (!r.ok || !d?.ok || !d.baris) throw new Error(d?.pesan ?? `HTTP ${r.status}`);
+      perHalaman = d.perHalaman ?? perHalaman;
+      totalHalaman = d.totalHalaman ?? 1;
+      halaman = d.halaman ?? n;
+      if (statTotal) statTotal.textContent = String(d.total ?? 0);
+      if (statHalaman) statHalaman.textContent = `${halaman} / ${totalHalaman}`;
+      renderPaginasi();
+      if (d.baris.length === 0) {
+        status("kosong");
+      } else {
+        isiTabel(d.baris);
+        status("isi");
+      }
+    } catch (err) {
+      console.error(err);
+      renderPaginasi();
+      status("galat");
+    } finally {
+      sedangMuat = false;
+    }
+  }
+
+  async function ambilSemua(): Promise<Baris[]> {
+    const r = await fetch(keApi("semua=1"));
+    const d = (await r.json().catch(() => null)) as Jawaban | null;
+    if (!r.ok || !d?.ok || !d.baris) throw new Error(d?.pesan ?? "Gagal memuat data");
+    return d.baris;
+  }
+
+  function namaFile(ext: string): string {
+    const d = new Date();
+    const p = (n: number) => String(n).padStart(2, "0");
+    return `tkaku-feedback-${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}.${ext}`;
+  }
+
+  function unduhBlob(blob: Blob, nama: string) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = nama;
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
+
+  function selengkapnya(b: Baris): (string | number)[] {
+    return [b.nama, b.kelas, b.pesan, tanggal(b.dikirim)];
+  }
+
+  const kepalaCsv = ["No", "Nama", "Kelas", "Pesan", "Dikirim"];
+
+  async function eksporCSV() {
+    const baris = await ambilSemua();
+    const esc = (v: string | number) => `"${String(v).replaceAll('"', '""')}"`;
+    const isi = baris.map((b, i) => [i + 1, ...selengkapnya(b)].map(esc).join(","));
+    const csv = [kepalaCsv.map(esc).join(","), ...isi].join("\r\n");
+    unduhBlob(new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" }), namaFile("csv"));
+  }
+
+  async function eksporXLSX() {
+    const [XLSX, baris] = await Promise.all([import("xlsx"), ambilSemua()]);
+    const data: (string | number)[][] = [
+      kepalaCsv,
+      ...baris.map((b, i) => [i + 1, ...selengkapnya(b)]),
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    ws["!cols"] = [{ wch: 5 }, { wch: 26 }, { wch: 14 }, { wch: 60 }, { wch: 22 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Feedback");
+    XLSX.writeFile(wb, namaFile("xlsx"));
+  }
+
+  async function eksporPDF() {
+    const [jspdf, autotable, baris] = await Promise.all([
+      import("jspdf"),
+      import("jspdf-autotable"),
+      ambilSemua(),
+    ]);
+    const doc = new jspdf.jsPDF({ unit: "mm", format: "a4" });
+    const lebar = doc.internal.pageSize.getWidth();
+
+    doc.setFillColor(47, 93, 75);
+    doc.rect(0, 0, lebar, 30, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.text("TKAku", 14, 15);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text("Masukan dari siswa", 14, 22);
+    doc.text(
+      new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }),
+      lebar - 14,
+      15,
+      { align: "right" },
+    );
+    doc.text(`${baris.length} masukan`, lebar - 14, 22, { align: "right" });
+
+    autotable.autoTable(doc, {
+      startY: 40,
+      head: [kepalaCsv],
+      body: baris.map((b, i) => [i + 1, ...selengkapnya(b)]),
+      theme: "grid",
+      styles: {
+        font: "helvetica",
+        fontSize: 8.5,
+        cellPadding: 1.8,
+        textColor: [51, 58, 56],
+        lineColor: [226, 232, 230],
+        lineWidth: 0.1,
+        overflow: "linebreak",
+      },
+      headStyles: { fillColor: [47, 93, 75], textColor: [255, 255, 255], fontStyle: "bold" },
+      columnStyles: {
+        0: { cellWidth: 10, halign: "center" },
+        2: { cellWidth: 18 },
+        4: { cellWidth: 26 },
+      },
+      margin: { left: 14, right: 14 },
+    });
+
+    const hal = doc.getNumberOfPages();
+    for (let i = 1; i <= hal; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(160, 160, 160);
+      doc.text(
+        `TKAku · Daftar masukan · halaman ${i} dari ${hal}`,
+        lebar / 2,
+        doc.internal.pageSize.getHeight() - 8,
+        { align: "center" },
+      );
+    }
+
+    doc.save(namaFile("pdf"));
+  }
+
+  const tombolUnduh = Array.from(document.querySelectorAll<HTMLButtonElement>(".aksi button"));
+  let timerStatus: ReturnType<typeof setTimeout> | undefined;
+
+  async function denganStatus(kerja: () => Promise<void>, btn: HTMLButtonElement) {
+    tombolUnduh.forEach((b) => (b.disabled = true));
+    btn.classList.add("muat");
+    if (statusUnduh) {
+      statusUnduh.hidden = false;
+      statusUnduh.classList.remove("salah");
+      statusUnduh.textContent = "Menyiapkan file…";
+    }
+    try {
+      await kerja();
+      track("unduh_feedback", { format: btn.dataset.format ?? "" });
+      if (statusUnduh) statusUnduh.textContent = "File berhasil diunduh.";
+    } catch (err) {
+      console.error(err);
+      if (statusUnduh) {
+        statusUnduh.textContent = "Gagal membuat file. Coba lagi ya.";
+        statusUnduh.classList.add("salah");
+      }
+    } finally {
+      btn.classList.remove("muat");
+      tombolUnduh.forEach((b) => (b.disabled = false));
+      clearTimeout(timerStatus);
+      timerStatus = setTimeout(() => {
+        if (statusUnduh) statusUnduh.hidden = true;
+      }, 4000);
+    }
+  }
+
+  document.getElementById("unduh-csv")?.addEventListener("click", (e) => {
+    denganStatus(eksporCSV, e.currentTarget as HTMLButtonElement);
+  });
+  document.getElementById("unduh-xlsx")?.addEventListener("click", (e) => {
+    denganStatus(eksporXLSX, e.currentTarget as HTMLButtonElement);
+  });
+  document.getElementById("unduh-pdf")?.addEventListener("click", (e) => {
+    denganStatus(eksporPDF, e.currentTarget as HTMLButtonElement);
+  });
+
+  void muat(1);
+  track("buka_feedback");
+
+  const header = document.querySelector("header");
+  const navToggle = document.getElementById("nav-toggle");
+  function tutupMenu() {
+    header?.classList.remove("menu-buka");
+    navToggle?.setAttribute("aria-expanded", "false");
+    navToggle?.setAttribute("aria-label", "Buka menu");
+  }
+  navToggle?.addEventListener("click", () => {
+    const buka = header?.classList.toggle("menu-buka") ?? false;
+    navToggle.setAttribute("aria-expanded", String(buka));
+    navToggle.setAttribute("aria-label", buka ? "Tutup menu" : "Buka menu");
+  });
+  document.querySelectorAll(".nav ul a").forEach((a) => a.addEventListener("click", tutupMenu));
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") tutupMenu();
+  });
+  document.addEventListener("click", (e) => {
+    if (!header?.classList.contains("menu-buka")) return;
+    if (!header.contains(e.target as Node)) tutupMenu();
+  });
+
+  const kurangGerak = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (kurangGerak) {
+    document.querySelectorAll<HTMLElement>(".reveal").forEach((el) => {
+      el.style.opacity = "1";
+      el.style.transform = "none";
+    });
+  } else {
+    animate("header", { y: [-70, 0], opacity: [0, 1] }, { duration: 0.6, ease: [0.16, 1, 0.3, 1] });
+    document.querySelectorAll<HTMLElement>(".reveal").forEach((el) => {
+      inView(
+        el,
+        () => {
+          animate(el, { opacity: [0, 1], y: [22, 0] }, { duration: 0.7, ease: [0.16, 1, 0.3, 1] });
+          return () => {};
+        },
+        { amount: 0.3, margin: "0px 0px -6% 0px" },
+      );
+    });
+  }
+</script>
