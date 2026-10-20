@@ -9,9 +9,12 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "db:setup": "node --env-file=.env scripts/db-setup.mjs"
   },
   "dependencies": {
+    "@astrojs/netlify": "^8.2.10",
+    "@libsql/client": "^0.18.0",
     "astro": "^7.3.8",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",

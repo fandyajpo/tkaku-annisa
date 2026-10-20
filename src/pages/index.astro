@@ -222,19 +222,18 @@ const keunggulan = [
           </p>
         </div>
 
-        <form id="form" name="kontak" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" novalidate class="reveal">
-          <input type="hidden" name="form-name" value="kontak" />
+        <form id="form" novalidate class="reveal">
           <p class="tersembunyi" aria-hidden="true">
             <label>Jangan diisi: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
           </p>
           <label
-            >Nama<input type="text" name="nama" autocomplete="name" required placeholder="Nama kamu" /></label
+            >Nama<input type="text" name="nama" autocomplete="name" required maxlength="100" placeholder="Nama kamu" /></label
           >
           <label
-            >Email<input type="email" name="email" autocomplete="email" required placeholder="nama@email.com" /></label
+            >Kelas<input type="text" name="kelas" required maxlength="50" placeholder="Contoh: 12 IPA" /></label
           >
           <label
-            >Pesan<textarea name="pesan" required placeholder="Tulis masukanmu di sini..."></textarea></label
+            >Pesan<textarea name="pesan" required maxlength="2000" placeholder="Tulis masukanmu di sini..."></textarea></label
           >
           <button class="btn btn-utama" type="submit">Kirim masukan</button>
           <div class="terkirim" id="terkirim" role="status">
@@ -612,6 +611,7 @@ const keunggulan = [
   const form = document.getElementById("form") as HTMLFormElement | null;
   const terkirim = document.getElementById("terkirim");
   const gagal = document.getElementById("gagal");
+  const pesanGagalAwal = gagal?.textContent ?? "";
 
   form?.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -623,14 +623,22 @@ const keunggulan = [
     }
     const isi = new FormData(form);
     try {
-      const res = await fetch("/", {
+      const res = await fetch("/api/kontak", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams(
-          [...isi.entries()].map(([k, v]) => [k, String(v)]),
-        ).toString(),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nama: String(isi.get("nama") ?? ""),
+          kelas: String(isi.get("kelas") ?? ""),
+          pesan: String(isi.get("pesan") ?? ""),
+          bot: String(isi.get("bot-field") ?? ""),
+        }),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const hasil = (await res.json().catch(() => null)) as { ok?: boolean; pesan?: string } | null;
+      if (!res.ok || !hasil?.ok) {
+        if (gagal) gagal.textContent = hasil?.pesan ?? pesanGagalAwal;
+        gagal?.classList.add("tampil");
+        return;
+      }
       track("submit_masukan");
       terkirim?.classList.add("tampil");
       form.reset();
@@ -639,6 +647,7 @@ const keunggulan = [
       }
     } catch (err) {
       console.error(err);
+      if (gagal) gagal.textContent = pesanGagalAwal;
       gagal?.classList.add("tampil");
     }
   });
