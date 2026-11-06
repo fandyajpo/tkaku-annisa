@@ -19,7 +19,13 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
     </a>
     <div class="bar-tengah">
       <span class="judul-bar">{meta.judul}</span>
-      <span class="progres-teks" id="progres-teks">Soal 1 dari 25</span>
+      <div class="bar-meta" id="bar-meta">
+        <span class="progres-teks" id="progres-teks">Soal 1 dari 25</span>
+        <span class="timer" id="timer" hidden>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
+          <span id="timer-teks">75:00</span>
+        </span>
+      </div>
     </div>
     <button class="suara" id="suara" type="button" aria-label="Suara efek" aria-pressed="true"></button>
   </header>
@@ -71,6 +77,16 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
     <button class="nav-btn peta-btn" id="buka-peta" type="button">Daftar soal</button>
     <button class="nav-btn utama" id="next" type="button">Selanjutnya →</button>
   </nav>
+
+  <div class="modal-lapis" id="modal-lapis" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-judul" aria-describedby="modal-teks">
+      <p class="modal-eyebrow" id="modal-eyebrow">Latihan TKA</p>
+      <h2 id="modal-judul"></h2>
+      <p class="modal-teks" id="modal-teks"></p>
+      <p class="modal-info" id="modal-info" hidden></p>
+      <div class="modal-aksi" id="modal-aksi"></div>
+    </div>
+  </div>
 
   <script type="application/json" id="paket-data" set:html={data}></script>
 </Layout>
@@ -126,6 +142,143 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
     font-size: 0.78rem;
     color: var(--ink-soft);
     font-weight: 600;
+  }
+
+  .bar-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+  }
+
+  .timer {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    color: var(--hijau-700);
+    background: var(--hijau-100);
+    padding: 2px 8px;
+    border-radius: 999px;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .timer[hidden] {
+    display: none;
+  }
+
+  .timer.hampir {
+    background: var(--salah-bg);
+    color: var(--salah);
+  }
+
+  .timer.habis {
+    background: var(--salah);
+    color: #fff;
+  }
+
+  .modal-lapis {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(29, 58, 49, 0.55);
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-lapis[hidden] {
+    display: none;
+  }
+
+  :global(body.modal-terbuka) {
+    overflow: hidden;
+  }
+
+  .modal {
+    width: 100%;
+    max-width: 440px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    background: var(--krem);
+    border-radius: 24px;
+    padding: 26px 22px 22px;
+    box-shadow: 0 30px 70px -30px rgba(0, 0, 0, 0.65);
+    text-align: center;
+    animation: modal-muncul 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes modal-muncul {
+    from {
+      opacity: 0;
+      transform: translateY(16px) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .modal-eyebrow {
+    display: inline-block;
+    margin: 0 0 10px;
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--hijau-700);
+    background: var(--hijau-100);
+    padding: 5px 12px;
+    border-radius: 999px;
+  }
+
+  .modal h2 {
+    margin: 0 0 10px;
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  .modal-teks {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 0.94rem;
+    line-height: 1.6;
+  }
+
+  .modal-info {
+    margin: 14px 0 0;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: var(--hijau-100);
+    color: var(--hijau-900);
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .modal-info[hidden] {
+    display: none;
+  }
+
+  .modal-aksi {
+    display: grid;
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .modal {
+      animation: none;
+    }
   }
 
   .suara {
@@ -884,6 +1037,8 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
   const slug = data.meta.slug;
   const total = soalList.length;
   const KUNCI = `tkaku-jawaban-${slug}`;
+  const DURASI = 75 * 60 * 1000;
+  const DURASI_TEKS = "75 menit";
   const kurangGerak = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const kartu = el("kartu");
@@ -914,23 +1069,270 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
   const unduhPdfBtn = el<HTMLButtonElement>("unduh-pdf");
   const unduhXlsxBtn = el<HTMLButtonElement>("unduh-xlsx");
   const unduhStatus = el("unduh-status");
+  const $timer = el<HTMLSpanElement>("timer");
+  const $timerTeks = el("timer-teks");
+  const modalLapis = el<HTMLDivElement>("modal-lapis");
+  const modalJudul = el("modal-judul");
+  const modalTeks = el("modal-teks");
+  const modalEyebrow = el("modal-eyebrow");
+  const modalInfo = el<HTMLParagraphElement>("modal-info");
+  const modalAksi = el("modal-aksi");
 
   let idx = 0;
   let jawab: Record<number, number[]> = {};
   let pernahSelesai = false;
+  let mulai: number | null = null;
+  let selesai = false;
+  let terkunci = false;
+  let aktif = false;
+  let jam: number | undefined;
 
   try {
-    const simpanan = JSON.parse(localStorage.getItem(KUNCI) ?? "null") as { idx?: number; jawab?: Record<number, number[]> } | null;
-    if (simpanan) {
-      idx = Math.min(Math.max(0, simpanan.idx ?? 0), total - 1);
-      jawab = simpanan.jawab ?? {};
+    const simpanan = JSON.parse(localStorage.getItem(KUNCI) ?? "null") as {
+      idx?: number;
+      jawab?: Record<number, number[]>;
+      mulai?: number;
+      selesai?: boolean;
+    } | null;
+    if (simpanan && typeof simpanan === "object") {
+      const adaJawaban = Boolean(simpanan.jawab && Object.keys(simpanan.jawab).length > 0);
+      const adaSesi = typeof simpanan.mulai === "number" || adaJawaban || Boolean(simpanan.selesai);
+      if (adaSesi) {
+        idx = Math.min(Math.max(0, simpanan.idx ?? 0), total - 1);
+        jawab = simpanan.jawab ?? {};
+        mulai = typeof simpanan.mulai === "number" ? simpanan.mulai : Date.now();
+        selesai = Boolean(simpanan.selesai);
+        pernahSelesai = Object.keys(jawab).length === total;
+      }
     }
   } catch {
     /* abaikan data rusak */
   }
 
   function simpan() {
-    localStorage.setItem(KUNCI, JSON.stringify({ idx, jawab }));
+    if (mulai === null) return;
+    try {
+      localStorage.setItem(KUNCI, JSON.stringify({ mulai, idx, jawab, selesai }));
+    } catch {
+      /* penyimpanan tidak tersedia */
+    }
+  }
+
+  function sisaWaktu(): number {
+    if (mulai === null) return DURASI;
+    return Math.max(0, mulai + DURASI - Date.now());
+  }
+
+  function formatWaktu(ms: number): string {
+    const detik = Math.ceil(ms / 1000);
+    const menit = Math.floor(detik / 60);
+    const sisaDetik = detik % 60;
+    return `${String(menit).padStart(2, "0")}:${String(sisaDetik).padStart(2, "0")}`;
+  }
+
+  function gambarTimer() {
+    if (mulai === null) {
+      $timer.hidden = true;
+      return;
+    }
+    $timer.hidden = false;
+    const ms = sisaWaktu();
+    if (selesai) {
+      $timerTeks.textContent = ms <= 0 ? "00:00" : "Selesai";
+    } else {
+      $timerTeks.textContent = formatWaktu(ms);
+    }
+    $timer.classList.toggle("hampir", !selesai && ms <= 5 * 60 * 1000 && ms > 0);
+    $timer.classList.toggle("habis", ms <= 0);
+  }
+
+  function infoLanjut(): string {
+    return `Sisa waktu: ${formatWaktu(sisaWaktu())} · Terjawab ${Object.keys(jawab).length}/${total}`;
+  }
+
+  function jalanTimer() {
+    window.clearInterval(jam);
+    gambarTimer();
+    if (menuModal === "lanjut" && !modalInfo.hidden) modalInfo.textContent = infoLanjut();
+    jam = window.setInterval(() => {
+      gambarTimer();
+      if (mulai !== null && sisaWaktu() <= 0 && !selesai) {
+        waktuHabis();
+        return;
+      }
+      if (menuModal === "lanjut" && !modalInfo.hidden) modalInfo.textContent = infoLanjut();
+    }, 1000);
+  }
+
+  type AksiModal = { label: string; kelas: "utama" | "lain"; onClick: () => void };
+  let menuModal: "mulai" | "lanjut" | "habis" | null = null;
+
+  function bukaModal(opsi: {
+    eyebrow?: string;
+    judul: string;
+    teks: string;
+    info?: string;
+    mode?: "mulai" | "lanjut" | "habis";
+    aksi: AksiModal[];
+  }) {
+    document.body.classList.add("modal-terbuka");
+    menuModal = opsi.mode ?? null;
+    modalEyebrow.textContent = opsi.eyebrow ?? "Latihan TKA";
+    modalJudul.textContent = opsi.judul;
+    modalTeks.textContent = opsi.teks;
+    modalInfo.hidden = !opsi.info;
+    modalInfo.textContent = opsi.info ?? "";
+    modalAksi.innerHTML = "";
+    opsi.aksi.forEach((a) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = `tombol ${a.kelas}`;
+      b.textContent = a.label;
+      b.addEventListener("click", () => {
+        sfx.klik();
+        a.onClick();
+      });
+      modalAksi.append(b);
+    });
+    modalLapis.hidden = false;
+    modalAksi.querySelector<HTMLButtonElement>("button")?.focus({ preventScroll: true });
+  }
+
+  function tutupModal() {
+    modalLapis.hidden = true;
+    document.body.classList.remove("modal-terbuka");
+    menuModal = null;
+  }
+
+  function mulaiSesi(dariAwal: boolean) {
+    if (!dariAwal && mulai !== null && !selesai && sisaWaktu() <= 0) {
+      waktuHabis();
+      return;
+    }
+    window.clearInterval(jam);
+    const reset = dariAwal || mulai === null || selesai;
+    if (reset) {
+      mulai = Date.now();
+      idx = 0;
+      jawab = {};
+      selesai = false;
+      pernahSelesai = false;
+    }
+    terkunci = false;
+    aktif = true;
+    tutupModal();
+    simpan();
+    tampil(idx, false);
+    jalanTimer();
+    track("sesi_mulai", { paket: slug, dari_awal: reset });
+  }
+
+  function selesaikanSesi() {
+    if (selesai) return;
+    selesai = true;
+    terkunci = true;
+    window.clearInterval(jam);
+    simpan();
+    gambarTimer();
+    kunciUI();
+  }
+
+  function kunciUI() {
+    $area.querySelectorAll<HTMLButtonElement>("button").forEach((b) => {
+      b.disabled = true;
+    });
+    $aksi.querySelectorAll<HTMLButtonElement>("button").forEach((b) => {
+      if (!(b.textContent ?? "").includes("pembahasan")) b.disabled = true;
+    });
+  }
+
+  function waktuHabis() {
+    if (selesai) return;
+    selesaikanSesi();
+    tampil(idx, false);
+    const s = hitungSkor();
+    if (s.kosong === 0) return;
+    track("waktu_habis", { paket: slug, benar: s.benar });
+    bukaModal({
+      eyebrow: "Waktu habis",
+      judul: "Waktunya sudah habis",
+      teks: "Kamu bisa melihat hasil dan pembahasan yang sudah dikerjakan, atau memulai sesi baru.",
+      info: `Skor sementara: ${s.benar} benar dari ${total} soal`,
+      mode: "habis",
+      aksi: [
+        { label: "Lihat hasil", kelas: "lain", onClick: tutupModal },
+        { label: "Mulai dari awal", kelas: "utama", onClick: () => mulaiSesi(true) },
+      ],
+    });
+  }
+  function inisialisasi() {
+    const kedaluwarsa = mulai !== null && (selesai || sisaWaktu() <= 0);
+    if (kedaluwarsa) {
+      selesai = true;
+      terkunci = true;
+      aktif = false;
+      simpan();
+    }
+
+    tampil(idx, false);
+
+    if (mulai === null) {
+      bukaModal({
+        eyebrow: `Latihan TKA · ${DURASI_TEKS}`,
+        judul: "Siap mulai latihan?",
+        teks: `Kamu punya waktu ${DURASI_TEKS} untuk mengerjakan ${total} soal. Waktu terus berjalan meski kamu keluar atau menutup halaman, dan tidak bisa dijeda.`,
+        info: `Durasi ${DURASI_TEKS} · ${total} soal`,
+        mode: "mulai",
+        aksi: [{ label: "Mulai sekarang", kelas: "utama", onClick: () => mulaiSesi(true) }],
+      });
+      return;
+    }
+
+    if (kedaluwarsa) {
+      gambarTimer();
+      const s = hitungSkor();
+      const tuntas = s.kosong === 0;
+      bukaModal({
+        eyebrow: tuntas ? "Sesi selesai" : "Waktu habis",
+        judul: tuntas ? "Latihan sudah selesai" : "Sesi sebelumnya sudah berakhir",
+        teks: tuntas
+          ? "Kamu sudah menjawab semua soal di sesi ini. Lihat hasil dan pembahasanmu, atau mulai sesi baru."
+          : "Waktu 75 menit untuk sesi ini sudah habis. Kamu masih bisa melihat hasil dan pembahasan, atau memulai sesi baru.",
+        info: `Skor: ${s.benar} benar dari ${total} soal`,
+        mode: "habis",
+        aksi: [
+          { label: "Lihat hasil", kelas: "lain", onClick: tutupModal },
+          { label: "Mulai dari awal", kelas: "utama", onClick: () => mulaiSesi(true) },
+        ],
+      });
+      return;
+    }
+
+    aktif = true;
+    bukaModal({
+      eyebrow: "Sesi ditemukan",
+      judul: "Lanjutkan latihan?",
+      teks: "Sepertinya kamu sempat keluar atau halaman dimuat ulang. Waktu tetap berjalan selama kamu pergi.",
+      info: infoLanjut(),
+      mode: "lanjut",
+      aksi: [
+        { label: "Lanjutkan", kelas: "utama", onClick: () => mulaiSesi(false) },
+        { label: "Mulai dari awal", kelas: "lain", onClick: () => konfirmasiUlang() },
+      ],
+    });
+    jalanTimer();
+  }
+
+  function konfirmasiUlang() {
+    bukaModal({
+      eyebrow: "Mulai dari awal",
+      judul: "Hapus jawaban dan mulai ulang?",
+      teks: "Semua jawaban di sesi ini akan dihapus dan waktu 75 menit dimulai dari nol.",
+      aksi: [
+        { label: "Ya, mulai dari awal", kelas: "utama", onClick: () => mulaiSesi(true) },
+        { label: "Batal", kelas: "lain", onClick: () => inisialisasi() },
+      ],
+    });
   }
 
   function esc(t: string): string {
@@ -1060,7 +1462,9 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
 
   function tombolCobaLagi(soal: Soal) {
     const b = tombolAksi("Coba lagi", "lain");
+    b.disabled = terkunci;
     b.addEventListener("click", () => {
+      if (terkunci) return;
       track("coba_lagi", { paket: slug, no: soal.no });
       delete jawab[soal.no];
       simpan();
@@ -1071,6 +1475,7 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
   }
 
   function selesaiJawab(soal: Soal, p: number[]) {
+    if (terkunci || !aktif) return;
     jawab[soal.no] = p;
     simpan();
     const hasil = evaluasi(soal, p);
@@ -1095,8 +1500,20 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
     }
     bukaPembahasan(true);
     const s = renderPeta();
-    if (s.kosong === 0) {
+    if (s.kosong === 0 && aktif && !selesai) {
       track("paket_selesai", { paket: slug, skor_benar: s.benar, total });
+      selesaikanSesi();
+      bukaModal({
+        eyebrow: "Sesi selesai",
+        judul: "Semua soal sudah dijawab!",
+        teks: "Waktu berhenti karena kamu sudah menyelesaikan seluruh soal. Lihat hasil dan pembahasanmu, atau mulai sesi baru.",
+        info: `Skor: ${s.benar} benar dari ${total} soal · Sisa waktu ${formatWaktu(sisaWaktu())}`,
+        mode: "habis",
+        aksi: [
+          { label: "Lihat hasil", kelas: "lain", onClick: tutupModal },
+          { label: "Mulai dari awal", kelas: "utama", onClick: () => mulaiSesi(true) },
+        ],
+      });
     }
   }
 
@@ -1127,8 +1544,11 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
           if (dipilih && !diKunci) b.classList.add("salah");
           tanda.textContent = diKunci ? "✓" : dipilih ? "✕" : "";
         }
+      } else if (terkunci) {
+        b.disabled = true;
       } else {
         b.addEventListener("click", () => {
+          if (terkunci) return;
           if (multi) {
             sfx.klik();
             if (set.has(i)) set.delete(i);
@@ -1145,18 +1565,21 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
     });
     $area.append(wadah);
 
-    if (!sudah && multi) {
+    if (!sudah && multi && !terkunci) {
       const cek = tombolAksi(soal.tanpaKunci ? "Simpan jawaban" : "Periksa jawaban", "utama");
       cek.disabled = true;
       cek.dataset.periksa = "1";
       cek.addEventListener("click", () => selesaiJawab(soal, [...set].sort((a, b) => a - b)));
       $aksi.append(cek);
-      catatan("Boleh pilih lebih dari satu, lalu tekan periksa.");
-    } else if (!sudah && !multi) {
+      catatan(
+        soal.tanpaKunci ? "Pilih jawabanmu, lalu simpan." : "Boleh pilih lebih dari satu, lalu tekan periksa.",
+      );
+    } else if (!sudah && !multi && !terkunci) {
       catatan(soal.tanpaKunci ? "Pilih satu jawabanmu, lalu cocokkan dengan pembahasan." : "Pilih satu jawaban — langsung dicek.");
     }
+    if (!sudah && terkunci) catatan("Waktu sudah habis. Jawaban tidak bisa diubah lagi.");
     tombolBahas(sudah);
-    if (sudah) tombolCobaLagi(soal);
+    if (sudah && !terkunci) tombolCobaLagi(soal);
   }
 
   function renderPernyataan(soal: Soal, pilihan: number[] | undefined) {
@@ -1183,8 +1606,11 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
           const diKunci = it.kunci === nilai;
           if (diKunci) b.classList.add("benar");
           if (dipilih && !diKunci) b.classList.add("salah");
+        } else if (terkunci) {
+          b.disabled = true;
         } else {
           b.addEventListener("click", () => {
+            if (terkunci) return;
             sfx.klik();
             jawabLokal[i] = vi;
             grup.querySelectorAll<HTMLButtonElement>(".verdict-btn").forEach((x, xi) => x.classList.toggle("terpilih", xi === vi));
@@ -1199,23 +1625,44 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
       wadah.append(baris);
     });
     $area.append(wadah);
-    if (!sudah) catatan(`Pilih ${v.join(" atau ")} untuk tiap pernyataan — langsung dicek setelah semua terjawab.`);
+    if (!sudah && !terkunci) catatan(`Pilih ${v.join(" atau ")} untuk tiap pernyataan — langsung dicek setelah semua terjawab.`);
+    if (terkunci && !sudah) catatan("Waktu sudah habis. Jawaban tidak bisa diubah lagi.");
     tombolBahas(sudah);
-    if (sudah) tombolCobaLagi(soal);
+    if (sudah && !terkunci) tombolCobaLagi(soal);
   }
 
   function renderTeks(soal: Soal, pilihan: number[] | undefined) {
     catatan("Soal ini tidak menyediakan pilihan jawaban. Baca pembahasan untuk jawabannya.");
+    if (terkunci && !pilihan) {
+      catatan("Waktu sudah habis. Jawaban tidak bisa diubah lagi.");
+      return;
+    }
     if (!pilihan) {
       const b = tombolAksi("Lihat pembahasan & jawaban", "utama");
+      b.disabled = terkunci;
       b.addEventListener("click", () => {
+        if (terkunci) return;
         track("buka_pembahasan", { paket: slug, no: soal.no });
         jawab[soal.no] = [0];
         simpan();
         sfx.klik();
         tampil(0, false);
         bukaPembahasan(true);
-        renderPeta();
+        const s = renderPeta();
+        if (s.kosong === 0 && aktif && !selesai) {
+          selesaikanSesi();
+          bukaModal({
+            eyebrow: "Sesi selesai",
+            judul: "Semua soal sudah dijawab!",
+            teks: "Waktu berhenti karena kamu sudah menyelesaikan seluruh soal. Lihat hasil dan pembahasanmu, atau mulai sesi baru.",
+            info: `Skor: ${s.benar} benar dari ${total} soal · Sisa waktu ${formatWaktu(sisaWaktu())}`,
+            mode: "habis",
+            aksi: [
+              { label: "Lihat hasil", kelas: "lain", onClick: tutupModal },
+              { label: "Mulai dari awal", kelas: "utama", onClick: () => mulaiSesi(true) },
+            ],
+          });
+        }
       });
       $aksi.append(b);
     } else {
@@ -1230,7 +1677,8 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
     return soal.banyakPilihanGanda ? "Pilih lebih dari satu" : "Pilihan tunggal";
   }
 
-  function tampil(arah: 1 | -1 | 0, gulir = true) {
+  function tampil(arah: number, gulir = true) {
+    idx = Math.min(Math.max(0, idx), total - 1);
     const soal = soalList[idx];
     $topik.textContent = `Soal ${soal.no} · ${soal.topik}`;
     $tipe.textContent = tipeLabel(soal);
@@ -1256,6 +1704,7 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
 
     renderPeta();
     simpan();
+    if (terkunci) kunciUI();
 
     if (arah && !kurangGerak) {
       animate(kartu, { opacity: [0, 1], x: [arah * 26, 0], scale: [0.985, 1] }, { duration: 0.45, ease: [0.16, 1, 0.3, 1] });
@@ -1573,15 +2022,25 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
   tirai.addEventListener("click", tutupLembar);
 
   ulangBtn.addEventListener("click", () => {
-    if (!confirm("Hapus semua jawaban di paket ini dan mulai dari soal 1 lagi?")) return;
-    track("ulang_paket", { paket: slug });
-    jawab = {};
-    idx = 0;
-    pernahSelesai = false;
-    localStorage.removeItem(KUNCI);
+    if (menuModal) return;
     sfx.klik();
-    tutupLembar();
-    tampil(0);
+    bukaModal({
+      eyebrow: "Mulai ulang",
+      judul: "Mulai dari awal?",
+      teks: "Semua jawaban di sesi ini akan dihapus dan waktu 75 menit dimulai ulang dari nol.",
+      aksi: [
+        {
+          label: "Ya, mulai dari awal",
+          kelas: "utama",
+          onClick: () => {
+            track("ulang_paket", { paket: slug });
+            tutupLembar();
+            mulaiSesi(true);
+          },
+        },
+        { label: "Batal", kelas: "lain", onClick: tutupModal },
+      ],
+    });
   });
 
   $prev.addEventListener("click", () => {
@@ -1602,16 +2061,33 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
 
   addEventListener("keydown", (e) => {
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-    if (e.key === "ArrowRight" && idx < total - 1) {
-      idx += 1;
-      tampil(1);
-    } else if (e.key === "ArrowLeft" && idx > 0) {
-      idx -= 1;
-      tampil(-1);
-    } else if (e.key === "Escape") {
-      tutupLembar();
+    if (modalLapis.hidden) {
+      if (e.key === "ArrowRight" && idx < total - 1) {
+        idx += 1;
+        tampil(1);
+      } else if (e.key === "ArrowLeft" && idx > 0) {
+        idx -= 1;
+        tampil(-1);
+      } else if (e.key === "Escape") {
+        tutupLembar();
+      }
     }
   });
+
+  function cekWaktu() {
+    gambarTimer();
+    if (mulai !== null && !selesai && sisaWaktu() <= 0) waktuHabis();
+  }
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) cekWaktu();
+  });
+
+  addEventListener("pageshow", (e) => {
+    cekWaktu();
+    if ((e as PageTransitionEvent).persisted && aktif && !selesai) jalanTimer();
+  });
+  addEventListener("focus", cekWaktu);
 
   const IKON_SUARA_ON = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>`;
   const IKON_SUARA_OFF = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="m16 9 5 6M21 9l-5 6"/></svg>`;
@@ -1629,5 +2105,5 @@ const data = JSON.stringify({ meta, soal }).replace(/</g, "\\u003c");
   });
 
   setSuara();
-  tampil(0, false);
+  inisialisasi();
 </script>

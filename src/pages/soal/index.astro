@@ -18,7 +18,7 @@ const daftar = Object.values(PAKET);
     <section class="judul reveal">
       <p class="label">Latihan soal &amp; pembahasan</p>
       <h1>Uji pemahamanmu,<br /><em>langsung dengan pembahasan.</em></h1>
-      <p class="lead">25 soal per paket, kunci jawaban, dan langkah penyelesaian lengkap. Kerjakan sesukamu — jawabanmu tersimpan, jadi bisa lanjut kapan saja.</p>
+      <p class="lead">25 soal per paket dengan waktu nyata 75 menit, kunci jawaban, dan langkah penyelesaian lengkap. Timer terus berjalan, tapi kamu bisa melanjutkan sesi kalau sempat keluar atau halaman dimuat ulang.</p>
     </section>
 
     <section class="paket-grid">
@@ -26,14 +26,14 @@ const daftar = Object.values(PAKET);
         <a class="kartu reveal" href={`/soal/${p.slug}/`}>
           <div class="kartu-kepala">
             <span class={`chip ${p.slug}`}>{p.slug === "wajib" ? "Wajib" : "Lanjut"}</span>
-            <span class="jumlah">25 soal</span>
+            <span class="jumlah">25 soal · 75 menit</span>
           </div>
           <h2>{p.judul}</h2>
           <p>{p.deskripsi}</p>
           <ul class="poin">
             <li>Pilihan ganda, ganda, Benar/Salah, sampai isian</li>
             <li>Pembahasan langkah demi langkah</li>
-            <li>Bisa dilanjutkan kapan saja</li>
+            <li>Timer 75 menit yang berjalan nyata</li>
           </ul>
           <span class="cta">Mulai kerjakan <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg></span>
         </a>
@@ -46,7 +46,7 @@ const daftar = Object.values(PAKET);
         <li><b>Pilih paket</b> — Wajib untuk dasar, Lanjut untuk yang siap naik level.</li>
         <li><b>Jawab di layar</b> — pilihan ganda bisa langsung diklik; yang ganda &amp; Benar/Salah tinggal centang lalu periksa.</li>
         <li><b>Buka pembahasan</b> — hanya bisa dibuka setelah kamu memilih jawaban, lalu muncul otomatis.</li>
-        <li><b>Lanjut kapan saja</b> — nomor soal &amp; jawabanmu tersimpan di perangkat ini.</li>
+        <li><b>Timer 75 menit</b> — waktu berjalan sejak kamu menekan Mulai. Kalau keluar atau refresh, kamu bisa pilih lanjutkan atau mulai dari awal.</li>
       </ol>
     </section>
   </main>
